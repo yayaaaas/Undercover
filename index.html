@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Undercover - Choix Auto & Manuel</title>
+  <title>Undercover - Mode Mystère Total</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -28,7 +28,7 @@
     }
     .tab-container {
       display: flex;
-      gap: 8px;
+      gap: 6px;
       margin-bottom: 20px;
       background: #181825;
       padding: 4px;
@@ -36,8 +36,8 @@
     }
     .tab-btn {
       flex: 1;
-      padding: 8px 10px;
-      font-size: 0.9rem;
+      padding: 8px 6px;
+      font-size: 0.82rem;
       border-radius: 6px;
       border: none;
       background: transparent;
@@ -104,7 +104,7 @@
     .vote-list { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
     .vote-btn { background: #45475a; color: #cdd6f4; margin-top: 0; }
     .vote-btn:hover { background: #585b70; }
-    .alive-count { font-size: 0.9rem; color: #bac2de; margin-bottom: 15px; }
+    .alive-count { font-size: 0.95rem; color: #bac2de; margin-bottom: 15px; }
     .badge {
       background: #181825;
       padding: 8px 12px;
@@ -133,18 +133,27 @@
 </head>
 <body>
 
-  <!-- 1. Configuration avec Choix du Mode -->
+  <!-- 1. Configuration avec 3 Modes -->
   <div class="card" id="setup-screen">
     <h2>Configuration</h2>
 
-    <!-- Onglets de choix de mode -->
     <div class="tab-container">
-      <button class="tab-btn active" id="tab-auto" onclick="setMode('auto')">🎲 Automatique</button>
+      <button class="tab-btn active" id="tab-mystery" onclick="setMode('mystery')">❓ Mystère</button>
+      <button class="tab-btn" id="tab-auto" onclick="setMode('auto')">🎲 Équilibré</button>
       <button class="tab-btn" id="tab-manual" onclick="setMode('manual')">✏️ Manuel</button>
     </div>
 
-    <!-- Mode 1 : Automatique / Aléatoire -->
-    <div id="mode-auto-view">
+    <!-- Mode 1 : Mystère Total -->
+    <div id="mode-mystery-view">
+      <div class="input-group">
+        <label>Nombre total de joueurs :</label>
+        <input type="number" id="total-mystery-players" value="5" min="3" max="20">
+      </div>
+      <div class="badge">❓ Rôles secrets inconnus (peut-être 0 Mr. White ou 0 Undercover)</div>
+    </div>
+
+    <!-- Mode 2 : Automatique / Équilibré classique -->
+    <div id="mode-auto-view" class="hidden">
       <div class="input-group">
         <label>Nombre total de joueurs :</label>
         <input type="number" id="total-auto-players" value="5" min="3" max="20" oninput="updateAutoPreview()">
@@ -152,7 +161,7 @@
       <div class="badge" id="auto-preview-badge">Civils : 3 | Undercover : 1 | Mr. White : 1</div>
     </div>
 
-    <!-- Mode 2 : Manuel -->
+    <!-- Mode 3 : Manuel -->
     <div id="mode-manual-view" class="hidden">
       <div class="input-group">
         <label>Civils :</label>
@@ -249,7 +258,7 @@
       { civil: "Soleil", undercover: "Lune" }
     ];
 
-    let currentMode = "auto"; // "auto" ou "manual"
+    let currentMode = "mystery"; // "mystery", "auto", "manual"
     let counts = { civils: 3, undercovers: 1, whites: 1 };
     let currentPair = null;
     let players = [];
@@ -257,27 +266,37 @@
     let eliminatedPlayer = null;
     let totalPlayersCount = 0;
 
-    // Basculement entre onglets Auto et Manuel
     function setMode(mode) {
       currentMode = mode;
-      const tabAuto = document.getElementById("tab-auto");
-      const tabManual = document.getElementById("tab-manual");
-      const viewAuto = document.getElementById("mode-auto-view");
-      const viewManual = document.getElementById("mode-manual-view");
+      ["mystery", "auto", "manual"].forEach(m => {
+        document.getElementById(`tab-${m}`).classList.toggle("active", m === mode);
+        document.getElementById(`mode-${m}-view`).classList.toggle("hidden", m !== mode);
+      });
+      if (mode === "auto") updateAutoPreview();
+      if (mode === "manual") updateManualTotal();
+    }
 
-      if (mode === "auto") {
-        tabAuto.classList.add("active");
-        tabManual.classList.remove("active");
-        viewAuto.classList.remove("hidden");
-        viewManual.classList.add("hidden");
-        updateAutoPreview();
-      } else {
-        tabManual.classList.add("active");
-        tabAuto.classList.remove("active");
-        viewManual.classList.remove("hidden");
-        viewAuto.classList.add("hidden");
-        updateManualTotal();
+    // Tirage aléatoire imprévisible (mode mystère)
+    function generateMysteryRoles(total) {
+      let maxImpostors = Math.floor((total - 1) / 2);
+      let totalImpostors = Math.floor(Math.random() * maxImpostors) + 1; // Au moins 1 imposteur
+
+      let undercovers = 0;
+      let whites = 0;
+
+      for (let i = 0; i < totalImpostors; i++) {
+        if (Math.random() < 0.6) {
+          undercovers++;
+        } else {
+          whites++;
+        }
       }
+
+      // Si le tirage a donné 0 des deux (cas limite), on force 1 Undercover
+      if (undercovers === 0 && whites === 0) undercovers = 1;
+
+      let civils = total - undercovers - whites;
+      return { civils, undercovers, whites };
     }
 
     function calculateAutoRoles(total) {
@@ -330,7 +349,10 @@
     }
 
     function goToNamesScreen() {
-      if (currentMode === "auto") {
+      if (currentMode === "mystery") {
+        totalPlayersCount = parseInt(document.getElementById("total-mystery-players").value) || 5;
+        counts = generateMysteryRoles(totalPlayersCount);
+      } else if (currentMode === "auto") {
         totalPlayersCount = parseInt(document.getElementById("total-auto-players").value) || 5;
         counts = calculateAutoRoles(totalPlayersCount);
       } else {
@@ -341,7 +363,7 @@
       }
 
       if (totalPlayersCount < 3) {
-        alert("Il faut au minimum 3 joueurs au total pour lancer la partie.");
+        alert("Il faut au minimum 3 joueurs au total.");
         return;
       }
 
@@ -438,11 +460,9 @@
     function showVoteScreen() {
       hideAllScreens();
       const alivePlayers = players.filter(p => p.alive);
-      const civilsAlive = alivePlayers.filter(p => p.type === 'civil').length;
-      const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
 
-      document.getElementById("alive-status").innerText = 
-        `Joueurs restants : ${alivePlayers.length} (Civils : ${civilsAlive} | Imposteurs : ${impostorsAlive})`;
+      // En mode mystère ou classique, on affiche uniquement le nombre total de survivants pour ne rien trahir
+      document.getElementById("alive-status").innerText = `Joueurs restants en lice : ${alivePlayers.length}`;
 
       const buttonsContainer = document.getElementById("vote-buttons");
       buttonsContainer.innerHTML = "";
@@ -491,7 +511,7 @@
 
       if (guess === actualWord) {
         addPoints(eliminatedPlayer.name, 10);
-        showScoreboard(false, `${eliminatedPlayer.name} (Mr. White) gagne la manche !`, `Devinette réussie ("${currentPair.civil}") ! +10 points.`);
+        showScoreboard(false, `${eliminatedPlayer.name} (Mr. White) vole la victoire !`, `Devinette réussie ("${currentPair.civil}") ! Il remporte +10 points.`);
       } else {
         alert(`Mauvais mot ! Le mot civil était "${currentPair.civil}".`);
         checkGameState();
@@ -516,7 +536,7 @@
           if (p.type === "undercover") addPoints(p.name, p.alive ? 6 : 3);
           if (p.type === "white" && p.alive) addPoints(p.name, 6);
         });
-        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs ont gagné (+6 pts aux survivants).`);
+        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs ont remporté la partie (+6 pts aux survivants).`);
         return;
       }
 
@@ -554,10 +574,6 @@
         showScoreboard(true, "Scores réinitialisés", "Compteurs remis à zéro.");
       }
     }
-
-    // Initialisation
-    updateAutoPreview();
-    updateManualTotal();
   </script>
 </body>
 </html>
