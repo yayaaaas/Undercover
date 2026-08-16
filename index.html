@@ -62,11 +62,20 @@
     }
 
     .brand {
-      font-weight: 800;
-      font-size: 1.3rem;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
-      -webkit-text-fill-color: transparent;
+    font-weight: 800;
+    font-size: 1.35rem;
+    letter-spacing: -0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #ffffff; /* Couleur de secours nette */
+    }
+
+    .brand-text {
+    background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: #818cf8; /* Fallback si le gradient n'est pas supporté */
     }
 
     main {
