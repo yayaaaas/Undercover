@@ -365,7 +365,6 @@
       font-size: 1.05rem;
     }
 
-    /* Tableau des scores et Récapitulatif */
     .scoreboard-table {
       width: 100%;
       border-collapse: collapse;
@@ -414,6 +413,15 @@
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
     .recap-item:last-child { border-bottom: none; }
+
+    .role-badge-revealed {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-weight: 800;
+      font-size: 1.1rem;
+      margin-top: 8px;
+    }
 
     .hidden { display: none !important; }
   </style>
@@ -581,11 +589,12 @@
       </div>
     </div>
 
-    <!-- 8. ÉLIMINATION (Sans afficher le mot !) -->
+    <!-- 8. ÉLIMINATION (Rôle révélé, mot caché) -->
     <div class="screen-container hidden" id="eliminated-screen">
       <div class="panel" style="text-align: center; padding: 3rem 2rem;">
         <h1 id="elim-title">Élimination</h1>
-        <p class="subtitle" id="elim-desc" style="font-size: 1.25rem; margin: 1.5rem 0; color: #fff;"></p>
+        <div id="elim-role-box" style="margin: 1.5rem 0;"></div>
+        <p class="subtitle" style="font-size: 0.95rem; color: var(--text-muted);">Son mot secret reste secret jusqu'à la fin de la manche.</p>
         <button class="btn-primary" onclick="continueAfterElimination()" style="max-width: 300px; margin: 0 auto;">Continuer la partie →</button>
       </div>
     </div>
@@ -594,7 +603,7 @@
     <div class="screen-container hidden" id="white-guess-screen">
       <div class="panel" style="text-align: center; padding: 3rem 2rem;">
         <h1 style="color: var(--accent-pink);">Dernière Chance !</h1>
-        <p class="subtitle"><strong id="white-player-name"></strong> peut tenter de voler la victoire (+10 pts) en devinant le mot des Civils :</p>
+        <p class="subtitle"><strong id="white-player-name"></strong> (Mr. White) a été éliminé mais peut voler la victoire (+10 pts) en devinant le mot des Civils :</p>
         <div style="max-width: 400px; margin: 2rem auto;">
           <input type="text" id="white-guess-input" placeholder="Tapez le mot civil ici..." style="font-size: 1.1rem; text-align: center;">
           <button class="btn-primary" onclick="checkWhiteGuess()" style="width: 100%; margin-top: 1rem;">Valider la devinette</button>
@@ -607,7 +616,7 @@
       <h1 id="winner-title">Fin de Manche</h1>
       <p class="subtitle" id="winner-desc"></p>
       
-      <!-- Récapitulatif des mots et rôles (Révélé uniquement à la fin) -->
+      <!-- Récapitulatif complet de fin de manche -->
       <div class="panel" id="endgame-recap-panel">
         <h2>🔍 Révélation des Mots & Rôles</h2>
         <div class="recap-box" id="recap-box-content"></div>
@@ -871,38 +880,38 @@
     }
 
     function startNewSpeechRound() {
-        hideAllScreens();
-        const alive = players.filter(p => p.alive);
-        
-        // 1. Mélange aléatoire des survivants
-        let speechOrder = [...alive].sort(() => Math.random() - 0.5);
+      hideAllScreens();
+      const alive = players.filter(p => p.alive);
+      
+      // Mélange aléatoire
+      let speechOrder = [...alive].sort(() => Math.random() - 0.5);
 
-        // 2. Si le 1er tiré est Mr. White, on le permute avec le premier joueur ayant un mot
-        if (speechOrder[0].type === "white") {
-            const nonWhiteIndex = speechOrder.findIndex(p => p.type !== "white");
-            if (nonWhiteIndex !== -1) {
-            [speechOrder[0], speechOrder[nonWhiteIndex]] = [speechOrder[nonWhiteIndex], speechOrder[0]];
-            }
+      // Empêcher Mr. White de commencer en premier
+      if (speechOrder[0].type === "white") {
+        const nonWhiteIndex = speechOrder.findIndex(p => p.type !== "white");
+        if (nonWhiteIndex !== -1) {
+          [speechOrder[0], speechOrder[nonWhiteIndex]] = [speechOrder[nonWhiteIndex], speechOrder[0]];
         }
+      }
 
-        const container = document.getElementById("speech-order-list");
-        container.innerHTML = "";
+      const container = document.getElementById("speech-order-list");
+      container.innerHTML = "";
 
-        speechOrder.forEach((player, idx) => {
-            const div = document.createElement("div");
-            div.className = "order-card";
-            div.innerHTML = `
-            <div class="order-badge">${idx + 1}</div>
-            <div>
-                <div style="font-weight: 700; font-size: 1.05rem;">${player.name}</div>
-                ${idx === 0 ? '<span style="color:var(--accent-green); font-size:0.8rem; font-weight:700;">★ Ouvre le tour</span>' : ''}
-                ${player.power === 'mute' ? '<span style="color:var(--accent-pink); font-size:0.8rem; margin-left:6px;">🤐 Muet</span>' : ''}
-            </div>
-            `;
-            container.appendChild(div);
-        });
+      speechOrder.forEach((player, idx) => {
+        const div = document.createElement("div");
+        div.className = "order-card";
+        div.innerHTML = `
+          <div class="order-badge">${idx + 1}</div>
+          <div>
+            <div style="font-weight: 700; font-size: 1.05rem;">${player.name}</div>
+            ${idx === 0 ? '<span style="color:var(--accent-green); font-size:0.8rem; font-weight:700;">★ Ouvre le tour</span>' : ''}
+            ${player.power === 'mute' ? '<span style="color:var(--accent-pink); font-size:0.8rem; margin-left:6px;">🤐 Muet</span>' : ''}
+          </div>
+        `;
+        container.appendChild(div);
+      });
 
-        document.getElementById("debate-screen").classList.remove("hidden");
+      document.getElementById("debate-screen").classList.remove("hidden");
     }
 
     function openVotePhase() {
@@ -977,7 +986,7 @@
       handleElimination(eliminated);
     }
 
-    // Élimination sans spoiler le mot
+    // Élimination : Affichage clair du RÔLE (sans dévoiler le mot)
     function handleElimination(player) {
       if (player.hasShield) {
         player.hasShield = false;
@@ -991,14 +1000,28 @@
 
       hideAllScreens();
       document.getElementById("elim-title").innerText = `${player.name} a été éliminé(e) !`;
-      
-      // On n'affiche PAS le mot ici, le suspense reste entier
-      document.getElementById("elim-desc").innerText = `Son rôle et son mot secret seront révélés à la fin de la partie.`;
+
+      const roleBox = document.getElementById("elim-role-box");
+      let roleHtml = "";
+
+      if (player.type === "civil") {
+        roleHtml = `<div class="role-badge-revealed" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green);">🧑‍🌾 C'était un Civil !</div>`;
+      } else if (player.type === "undercover") {
+        roleHtml = `<div class="role-badge-revealed" style="background: rgba(244, 63, 94, 0.2); color: var(--accent-pink); border: 1px solid var(--accent-pink);">🕵️ C'était un Undercover !</div>`;
+      } else if (player.type === "white") {
+        roleHtml = `<div class="role-badge-revealed" style="background: rgba(244, 63, 94, 0.2); color: var(--accent-pink); border: 1px solid var(--accent-pink);">🎭 C'était Mr. White !</div>`;
+      }
+
+      if (player.power) {
+        const map = { mayor: "👑 Le Maire", shield: "🛡️ Le Bouclier", mute: "🤐 Le Muet" };
+        roleHtml += `<div class="power-tag" style="margin-top: 8px;">Pouvoir : ${map[player.power]}</div>`;
+      }
+
+      roleBox.innerHTML = roleHtml;
       document.getElementById("eliminated-screen").classList.remove("hidden");
     }
 
     function continueAfterElimination() {
-      // Si Mr. White est éliminé, on lui donne sa chance de deviner
       if (eliminatedPlayer.type === "white") {
         hideAllScreens();
         document.getElementById("white-player-name").innerText = eliminatedPlayer.name;
@@ -1015,9 +1038,9 @@
 
       if (guess === actualWord) {
         addPoints(eliminatedPlayer.name, 10);
-        showScoreboard(false, `${eliminatedPlayer.name} (Mr. White) vole la victoire !`, `Devinette réussie ! Il remporte +10 points.`);
+        showScoreboard(false, `${eliminatedPlayer.name} vole la victoire !`, `Devinette réussie ("${currentPair.civil}"). +10 points !`);
       } else {
-        alert(`Mauvaise devinette ! ${eliminatedPlayer.name} quitte la partie.`);
+        alert(`Mauvaise devinette ! ${eliminatedPlayer.name} quitte définitivement la partie.`);
         checkGameState();
       }
     }
@@ -1031,7 +1054,7 @@
         players.forEach(p => {
           if (p.type === "civil") addPoints(p.name, p.alive ? 2 : 1);
         });
-        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs ont été démasqués (+2 pts aux survivants).`);
+        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs sont éliminés (+2 pts aux survivants).`);
         return;
       }
 
@@ -1040,14 +1063,13 @@
           if (p.type === "undercover") addPoints(p.name, p.alive ? 6 : 3);
           if (p.type === "white" && p.alive) addPoints(p.name, 6);
         });
-        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs remportent la manche (+6 pts aux survivants).`);
+        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs remportent la manche (+6 pts).`);
         return;
       }
 
       startNewSpeechRound();
     }
 
-    // Affichage des scores et RÉVÉLATION FINALE de tous les mots
     function showScoreboard(fromMenu = false, title = "Tableau des Scores", desc = "") {
       hideAllScreens();
       document.getElementById("winner-title").innerText = title;
@@ -1112,7 +1134,7 @@
     function resetAllScores() {
       if (confirm("Remettre les scores de tous les joueurs à zéro ?")) {
         localStorage.removeItem("undercover_scores");
-        showScoreboard(true, "Scores réinitialisés", "Tous les compteurs sont à 0.");
+        showScoreboard(true, "Scores réinitialisés", "Compteurs remis à zéro.");
       }
     }
 
