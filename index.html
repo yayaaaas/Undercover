@@ -543,21 +543,24 @@
     }
 
     function checkGameState() {
-      const alivePlayers = players.filter(p => p.alive);
-      const civilsAlive = alivePlayers.filter(p => p.type === 'civil').length;
-      const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
+        const alivePlayers = players.filter(p => p.alive);
+        const civilsAlive = alivePlayers.filter(p => p.type === 'civil').length;
+        const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
 
-      if (impostorsAlive === 0) {
-        endGame("Victoire des Civils !", `Tous les imposteurs ont été éliminés. Le mot était "${currentPair.civil}".`);
-        return;
-      }
+        // 1. Victoire des Civils : tous les imposteurs ont été éliminés
+        if (impostorsAlive === 0) {
+            endGame("Victoire des Civils !", `Tous les imposteurs ont été démasqués. Le mot était "${currentPair.civil}".`);
+            return;
+        }
 
-      if (impostorsAlive >= civilsAlive) {
-        endGame("Victoire des Imposteurs !", `Les imposteurs sont en supériorité numérique. Mot Civil : "${currentPair.civil}" | Mot Undercover : "${currentPair.undercover}".`);
-        return;
-      }
+        // 2. Victoire des Imposteurs : ils sont strictement plus nombreux que les civils (ou 1 seul civil restant)
+        if (impostorsAlive > civilsAlive || civilsAlive <= 1) {
+            endGame("Victoire des Imposteurs !", `Les imposteurs ont pris le dessus. Civils : "${currentPair.civil}" | Undercovers : "${currentPair.undercover}".`);
+            return;
+        }
 
-      showVoteScreen();
+        // 3. Le jeu continue : il reste autant ou plus de civils que d'imposteurs (civils >= imposteurs)
+        showVoteScreen();
     }
 
     function endGame(title, desc) {
