@@ -10,10 +10,10 @@
   <style>
     :root {
       --bg: #0b0f19;
-      --bg-panel: rgba(17, 24, 39, 0.7);
+      --bg-panel: rgba(17, 24, 39, 0.85);
       --bg-panel-solid: #111827;
-      --border: rgba(255, 255, 255, 0.08);
-      --border-focus: rgba(99, 102, 241, 0.6);
+      --border: rgba(255, 255, 255, 0.12);
+      --border-focus: rgba(99, 102, 241, 0.8);
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --primary-glow: rgba(99, 102, 241, 0.35);
@@ -23,7 +23,8 @@
       --accent-purple: #a855f7;
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
-      --input-bg: rgba(3, 7, 18, 0.6);
+      --input-bg: #151d30;
+      --select-option-bg: #1e293b;
     }
 
     * {
@@ -37,22 +38,21 @@
     body {
       background-color: var(--bg);
       background-image: 
-        radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
-        radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
+        radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.12) 0%, transparent 40%);
       color: var(--text-main);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
 
-    /* Header large */
     header {
       width: 100%;
       padding: 1.25rem 2rem;
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      background: rgba(11, 15, 25, 0.8);
+      background: rgba(11, 15, 25, 0.85);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -62,24 +62,19 @@
     }
 
     .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
       font-weight: 800;
       font-size: 1.3rem;
       letter-spacing: -0.5px;
       background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
-      -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    /* Conteneur Plein Écran */
     main {
       flex: 1;
       width: 100%;
-      max-width: 1200px;
+      max-width: 1100px;
       margin: 0 auto;
-      padding: 2.5rem 1.5rem;
+      padding: 2rem 1.25rem;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -87,15 +82,14 @@
 
     .screen-container {
       width: 100%;
-      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      animation: fadeIn 0.25s ease-out;
     }
 
     @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
+      from { opacity: 0; transform: translateY(8px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    /* Grilles et Layouts */
     .grid-2 {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -108,6 +102,20 @@
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 1rem;
       margin: 1.5rem 0;
+      max-height: 50vh;
+      overflow-y: auto;
+      padding-right: 6px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .grid-cards::-webkit-scrollbar,
+    .name-inputs-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .grid-cards::-webkit-scrollbar-thumb,
+    .name-inputs-list::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
     }
 
     .panel {
@@ -119,27 +127,25 @@
       padding: 1.75rem;
     }
 
-    /* Typographie */
     h1 {
-      font-size: 2.5rem;
+      font-size: 2.2rem;
       font-weight: 800;
-      letter-spacing: -1px;
+      letter-spacing: -0.5px;
       margin-bottom: 0.5rem;
     }
 
     h2 {
-      font-size: 1.5rem;
+      font-size: 1.4rem;
       font-weight: 700;
       margin-bottom: 1rem;
     }
 
     p.subtitle {
       color: var(--text-muted);
-      font-size: 1rem;
+      font-size: 0.95rem;
       margin-bottom: 1.5rem;
     }
 
-    /* Onglets de configuration */
     .tab-container {
       display: flex;
       background: var(--input-bg);
@@ -153,7 +159,7 @@
     .tab-btn {
       flex: 1;
       padding: 12px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       font-weight: 700;
       border-radius: 10px;
       border: none;
@@ -169,7 +175,6 @@
       box-shadow: 0 4px 14px var(--primary-glow);
     }
 
-    /* Formulaires */
     .input-row {
       display: flex;
       justify-content: space-between;
@@ -186,15 +191,37 @@
       color: var(--text-main);
     }
 
+    /* Correctif complet pour inputs et sélecteurs déroulants */
     input[type="number"], input[type="text"], select {
-      background: rgba(255, 255, 255, 0.04);
+      background-color: var(--input-bg);
       border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 10px 14px;
+      padding: 12px 14px;
       border-radius: 10px;
-      font-size: 1rem;
+      font-size: 0.95rem;
       outline: none;
       transition: all 0.2s;
+    }
+
+    /* Custom Select avec flèche SVG nette */
+    select {
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      cursor: pointer;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      background-size: 16px;
+      padding-right: 40px;
+    }
+
+    /* Options visibles sur tous les systèmes */
+    select option {
+      background-color: var(--select-option-bg);
+      color: #ffffff;
+      padding: 12px;
+      font-size: 0.95rem;
     }
 
     input[type="number"] {
@@ -209,10 +236,9 @@
 
     input:focus, select:focus {
       border-color: var(--border-focus);
-      background: rgba(255, 255, 255, 0.08);
+      background-color: #1e293b;
     }
 
-    /* Boutons */
     .btn-group {
       display: flex;
       gap: 1rem;
@@ -235,14 +261,7 @@
       min-width: 200px;
     }
 
-    button.btn-primary:hover {
-      box-shadow: 0 12px 28px var(--primary-glow);
-      transform: translateY(-2px);
-    }
-
-    button.btn-primary:active {
-      transform: translateY(0);
-    }
+    button.btn-primary:active { transform: scale(0.98); }
 
     button.btn-secondary {
       background: var(--input-bg);
@@ -253,19 +272,15 @@
       font-weight: 600;
       border-radius: 14px;
       cursor: pointer;
-      transition: background 0.2s, border-color 0.2s;
+      transition: background 0.2s;
     }
 
-    button.btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.08);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
+    button.btn-secondary:hover { background: #1e293b; }
 
-    /* Révélation Immersive */
     .reveal-card {
       background: radial-gradient(circle at center, rgba(16, 185, 129, 0.12) 0%, rgba(17, 24, 39, 0.8) 100%);
       border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 4rem 2rem;
+      padding: 3.5rem 2rem;
       border-radius: 28px;
       text-align: center;
       margin: 1.5rem 0;
@@ -277,7 +292,7 @@
     }
 
     .secret-word-display {
-      font-size: 3.5rem;
+      font-size: 3rem;
       font-weight: 800;
       color: var(--accent-green);
       letter-spacing: -1px;
@@ -290,7 +305,18 @@
       text-shadow: 0 0 35px rgba(244, 63, 94, 0.4);
     }
 
-    /* Ordre de parole large */
+    .power-tag {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: #d8b4fe;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: inline-block;
+      margin-top: 6px;
+    }
+
     .order-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -320,19 +346,6 @@
       font-weight: 800;
     }
 
-    .power-tag {
-      background: rgba(168, 85, 247, 0.15);
-      border: 1px solid rgba(168, 85, 247, 0.3);
-      color: #d8b4fe;
-      padding: 4px 10px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      display: inline-block;
-      margin-top: 6px;
-    }
-
-    /* Vote Cards */
     .vote-card {
       background: var(--input-bg);
       border: 1px solid var(--border);
@@ -345,10 +358,9 @@
 
     .vote-card span {
       font-weight: 700;
-      font-size: 1.1rem;
+      font-size: 1.05rem;
     }
 
-    /* Tableau des scores large */
     .scoreboard-table {
       width: 100%;
       border-collapse: collapse;
@@ -385,30 +397,24 @@
 </head>
 <body>
 
-  <!-- Navigation / Barre Supérieure -->
   <header>
-    <div class="brand">
-      <span>🕵️ Undercover</span>
-    </div>
-    <div>
-      <button class="btn-secondary" onclick="showScoreboard(true)" style="padding: 8px 16px; font-size: 0.85rem;">🏆 Scores</button>
-    </div>
+    <div class="brand">🕵️ Undercover</div>
+    <button class="btn-secondary" onclick="showScoreboard(true)" style="padding: 8px 16px; font-size: 0.85rem;">🏆 Scores</button>
   </header>
 
   <main>
-    <!-- 1. CONFIGURATION PLEIN ÉCRAN -->
+    <!-- 1. CONFIGURATION -->
     <div class="screen-container" id="setup-screen">
       <h1>Nouvelle Partie</h1>
-      <p class="subtitle">Ajustez les effectifs et activez les mécaniques de jeu selon vos envies.</p>
+      <p class="subtitle">Ajustez les paramètres de la manche selon votre groupe.</p>
 
       <div class="tab-container">
         <button class="tab-btn active" id="tab-mystery" onclick="setMode('mystery')">❓ Mystère Total</button>
-        <button class="tab-btn" id="tab-auto" onclick="setMode('auto')">🎲 Répartition Équilibrée</button>
-        <button class="tab-btn" id="tab-manual" onclick="setMode('manual')">✏️ Configuration Manuelle</button>
+        <button class="tab-btn" id="tab-auto" onclick="setMode('auto')">🎲 Équilibré</button>
+        <button class="tab-btn" id="tab-manual" onclick="setMode('manual')">✏️ Manuel</button>
       </div>
 
       <div class="grid-2">
-        <!-- Panneau de gauche : Effectifs -->
         <div class="panel">
           <h2>Rôles & Effectifs</h2>
 
@@ -418,7 +424,7 @@
               <input type="number" id="total-mystery-players" value="5" min="3" max="20">
             </div>
             <div class="power-tag" style="width: 100%; text-align: center; padding: 10px; margin-top: 10px;">
-              ❓ Rôles secrets imprévisibles (0, 1 ou plusieurs Undercovers/Mr. White)
+              ❓ Rôles secrets imprévisibles (Undercovers et Mr. White aléatoires)
             </div>
           </div>
 
@@ -451,15 +457,14 @@
           </div>
         </div>
 
-        <!-- Panneau de droite : Pouvoirs & Options -->
         <div class="panel">
-          <h2>Pouvoirs Spéciaux</h2>
+          <h2>Pouvoirs Secondaires</h2>
           <div style="margin-bottom: 1.5rem;">
-            <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Mode d'attribution</label>
+            <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Attribution des rôles spéciaux</label>
             <select id="secondary-roles-mode" onchange="toggleSecondarySettings()" style="width: 100%;">
               <option value="none">Désactivés</option>
-              <option value="mystery" selected>❓ Mystère (0, 1 ou plusieurs pouvoirs distribués)</option>
-              <option value="manual">✏️ Choix manuel des rôles en jeu</option>
+              <option value="mystery" selected>❓ Mystère (distribution secrète)</option>
+              <option value="manual">✏️ Choix manuel précis</option>
             </select>
           </div>
 
@@ -469,7 +474,7 @@
               <input type="checkbox" id="role-mayor">
             </label>
             <label class="input-row" style="cursor: pointer;">
-              <span>🛡️ <strong>Le Bouclier</strong> (Survit à 1 élimination)</span>
+              <span>🛡️ <strong>Le Bouclier</strong> (Survit à 1 vote)</span>
               <input type="checkbox" id="role-shield">
             </label>
             <label class="input-row" style="cursor: pointer;">
@@ -493,18 +498,18 @@
         <div class="grid-cards" id="names-container"></div>
       </div>
       <div class="btn-group">
-        <button class="btn-primary" onclick="startGame()">Lancer la distribution des rôles →</button>
-        <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">← Configuration</button>
+        <button class="btn-primary" onclick="startGame()">Distribuer les rôles →</button>
+        <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">← Retour</button>
       </div>
     </div>
 
     <!-- 3. PASSAGE DU TÉLÉPHONE -->
     <div class="screen-container hidden" id="pass-screen">
       <div class="panel" style="text-align: center; padding: 4rem 2rem;">
-        <p class="subtitle" style="text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Au tour de</p>
-        <h1 style="color: var(--primary); font-size: 4rem; margin-bottom: 1rem;" id="player-target-name">---</h1>
-        <p class="subtitle">Prenez l'appareil et assurez-vous que personne ne regarde votre écran.</p>
-        <button class="btn-primary" onclick="showRole()" style="max-width: 320px; margin: 2rem auto 0 auto;">Voir mon rôle secret</button>
+        <p class="subtitle" style="text-transform: uppercase; font-weight: 700;">Au tour de</p>
+        <h1 style="color: var(--primary); font-size: 3.5rem; margin-bottom: 1rem;" id="player-target-name">---</h1>
+        <p class="subtitle">Prenez l'appareil à l'abri des regards indiscrets.</p>
+        <button class="btn-primary" onclick="showRole()" style="max-width: 320px; margin: 2rem auto 0 auto;">Découvrir mon rôle</button>
       </div>
     </div>
 
@@ -516,18 +521,16 @@
           <div class="secret-word-display" id="word-display">---</div>
           <div id="power-display"></div>
         </div>
-        <p class="subtitle" id="role-hint">Mémorisez-le bien et restez discret pendant les débats.</p>
-        <button class="btn-primary" onclick="nextPlayer()" style="max-width: 320px; margin: 0 auto;">Cacher et passer au suivant →</button>
+        <p class="subtitle" id="role-hint">Mémorisez-le bien et restez discret.</p>
+        <button class="btn-primary" onclick="nextPlayer()" style="max-width: 320px; margin: 0 auto;">Cacher et passer →</button>
       </div>
     </div>
 
     <!-- 5. ORDRE DE PAROLE -->
     <div class="screen-container hidden" id="debate-screen">
-      <h1>Phase de Débat</h1>
-      <p class="subtitle">Chaque joueur donne un mot-indice à tour de rôle en suivant scrupuleusement cet ordre :</p>
-      
+      <h1>Tour de Table</h1>
+      <p class="subtitle">Donnez chacun un mot-indice à voix haute en suivant cet ordre :</p>
       <div class="order-grid" id="speech-order-list"></div>
-
       <div class="btn-group">
         <button class="btn-primary" onclick="openVotePhase()">Passer aux Votes et Accusations →</button>
       </div>
@@ -535,21 +538,19 @@
 
     <!-- 6. VOTE INDIVIDUEL -->
     <div class="screen-container hidden" id="vote-screen">
-      <h1>Scrutin & Accusations</h1>
-      <p class="subtitle">Chaque joueur vivant vote secrètement contre la personne qu'il soupçonne :</p>
-      
+      <h1>Phase de Vote</h1>
+      <p class="subtitle">Chaque joueur sélectionne qui il souhaite accuser (ou vote blanc) :</p>
       <div class="grid-cards" id="vote-inputs-container"></div>
-
       <div class="btn-group">
-        <button class="btn-primary" onclick="processVotes()">Dépouiller les votes →</button>
+        <button class="btn-primary" onclick="processVotes()">Dépouiller le vote →</button>
       </div>
     </div>
 
-    <!-- 7. ÉGALITÉ / TOUR NEUTRE -->
+    <!-- 7. ÉGALITÉ -->
     <div class="screen-container hidden" id="tie-screen">
       <div class="panel" style="text-align: center; padding: 3rem 2rem;">
-        <h1 style="color: var(--accent-amber);">⚖️ Aucun Suspect Éliminé</h1>
-        <p class="subtitle" id="tie-desc" style="font-size: 1.2rem; margin: 1.5rem 0;">Égalité parfaite ou majorité de votes blancs.</p>
+        <h1 style="color: var(--accent-amber);">⚖️ Aucun Joueur Éliminé</h1>
+        <p class="subtitle" id="tie-desc" style="font-size: 1.15rem; margin: 1.5rem 0;">Égalité parfaite ou majorité de votes blancs.</p>
         <button class="btn-primary" onclick="startNewSpeechRound()" style="max-width: 300px; margin: 0 auto;">Lancer un nouveau tour de parole</button>
       </div>
     </div>
@@ -558,8 +559,8 @@
     <div class="screen-container hidden" id="eliminated-screen">
       <div class="panel" style="text-align: center; padding: 3rem 2rem;">
         <h1 id="elim-title">Élimination</h1>
-        <p class="subtitle" id="elim-desc" style="font-size: 1.3rem; margin: 1.5rem 0; color: #fff;"></p>
-        <button class="btn-primary" onclick="continueAfterElimination()" style="max-width: 300px; margin: 0 auto;">Poursuivre la partie →</button>
+        <p class="subtitle" id="elim-desc" style="font-size: 1.25rem; margin: 1.5rem 0; color: #fff;"></p>
+        <button class="btn-primary" onclick="continueAfterElimination()" style="max-width: 300px; margin: 0 auto;">Continuer la partie →</button>
       </div>
     </div>
 
@@ -567,9 +568,9 @@
     <div class="screen-container hidden" id="white-guess-screen">
       <div class="panel" style="text-align: center; padding: 3rem 2rem;">
         <h1 style="color: var(--accent-pink);">Dernière Chance !</h1>
-        <p class="subtitle"><strong id="white-player-name"></strong> a été découvert mais peut voler la victoire (+10 pts) en devinant le mot exact des Civils :</p>
+        <p class="subtitle"><strong id="white-player-name"></strong> peut voler la victoire (+10 pts) en devinant le mot des Civils :</p>
         <div style="max-width: 400px; margin: 2rem auto;">
-          <input type="text" id="white-guess-input" placeholder="Tapez le mot civil ici..." style="font-size: 1.2rem; padding: 14px; text-align: center;">
+          <input type="text" id="white-guess-input" placeholder="Tapez le mot civil ici..." style="font-size: 1.1rem; text-align: center;">
           <button class="btn-primary" onclick="checkWhiteGuess()" style="width: 100%; margin-top: 1rem;">Valider la devinette</button>
         </div>
       </div>
@@ -581,7 +582,7 @@
       <p class="subtitle" id="winner-desc"></p>
       
       <div class="panel">
-        <h2>Classement Général</h2>
+        <h2>Classement</h2>
         <table class="scoreboard-table">
           <thead>
             <tr><th>Joueur</th><th>Score</th></tr>
@@ -592,7 +593,7 @@
 
       <div class="btn-group">
         <button class="btn-primary" onclick="restartMatch()">Manche Suivante →</button>
-        <button class="btn-secondary" onclick="resetAllScores()">Remettre les scores à zéro</button>
+        <button class="btn-secondary" onclick="resetAllScores()">Remettre à 0</button>
       </div>
     </div>
   </main>
@@ -818,7 +819,7 @@
 
       powerDisplay.innerHTML = "";
       if (current.power === "mayor") {
-        powerDisplay.innerHTML = `<div class="power-tag">👑 Rôle Spécial : Le Maire (Vote compte double)</div>`;
+        powerDisplay.innerHTML = `<div class="power-tag">👑 Rôle Spécial : Le Maire (Vote double)</div>`;
       } else if (current.power === "shield") {
         powerDisplay.innerHTML = `<div class="power-tag">🛡️ Rôle Spécial : Le Bouclier (Survit à 1 élimination)</div>`;
       } else if (current.power === "mute") {
@@ -850,7 +851,7 @@
         div.innerHTML = `
           <div class="order-badge">${idx + 1}</div>
           <div>
-            <div style="font-weight: 700; font-size: 1.1rem;">${player.name}</div>
+            <div style="font-weight: 700; font-size: 1.05rem;">${player.name}</div>
             ${idx === 0 ? '<span style="color:var(--accent-green); font-size:0.8rem; font-weight:700;">★ Ouvre le tour</span>' : ''}
             ${player.power === 'mute' ? '<span style="color:var(--accent-pink); font-size:0.8rem; margin-left:6px;">🤐 Muet</span>' : ''}
           </div>
@@ -874,7 +875,7 @@
         let options = `<option value="-1">⚪ Vote blanc / Passer</option>`;
         alive.forEach(suspect => {
           if (suspect.id !== voter.id) {
-            options += `<option value="${suspect.id}">${suspect.name}</option>`;
+            options += `<option value="${suspect.id}">❌ Accuser ${suspect.name}</option>`;
           }
         });
 
@@ -978,7 +979,7 @@
 
       if (guess === actualWord) {
         addPoints(eliminatedPlayer.name, 10);
-        showScoreboard(false, `${eliminatedPlayer.name} vole la victoire !`, `Devinette réussie ("${currentPair.civil}") ! +10 points.`);
+        showScoreboard(false, `${eliminatedPlayer.name} vole la victoire !`, `Devinette réussie ("${currentPair.civil}"). +10 points !`);
       } else {
         alert(`Mauvais mot ! Le mot civil était "${currentPair.civil}".`);
         checkGameState();
@@ -1037,7 +1038,7 @@
     function resetAllScores() {
       if (confirm("Remettre les scores de tous les joueurs à zéro ?")) {
         localStorage.removeItem("undercover_scores");
-        showScoreboard(true, "Scores réinitialisés", "Tous les compteurs sont à 0.");
+        showScoreboard(true, "Scores réinitialisés", "Compteurs remis à zéro.");
       }
     }
 
