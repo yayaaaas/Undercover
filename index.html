@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Undercover - Système de Points</title>
+  <title>Undercover - Rôles Aléatoires & Auto</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -68,8 +68,12 @@
     button:hover { background: #b4befe; }
     .btn-secondary { background: #45475a; color: #cdd6f4; }
     .btn-secondary:hover { background: #585b70; }
-    .btn-danger { background: #f38ba8; color: #11111b; }
-    .btn-danger:hover { background: #eba0ac; }
+    .btn-toggle {
+      background: #fab387;
+      color: #11111b;
+      margin-bottom: 15px;
+    }
+    .btn-toggle:hover { background: #f9e2af; }
     .hidden { display: none; }
     .secret-word {
       font-size: 1.6rem;
@@ -82,8 +86,15 @@
     .vote-btn { background: #45475a; color: #cdd6f4; margin-top: 0; }
     .vote-btn:hover { background: #585b70; }
     .alive-count { font-size: 0.9rem; color: #bac2de; margin-bottom: 15px; }
-    
-    /* Tableau des scores */
+    .badge {
+      background: #181825;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: #a6adc8;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
     .score-table {
       width: 100%;
       border-collapse: collapse;
@@ -103,21 +114,39 @@
 </head>
 <body>
 
-  <!-- 1. Configuration des effectifs -->
+  <!-- 1. Configuration des effectifs & Mode de répartition -->
   <div class="card" id="setup-screen">
-    <h2>Undercover</h2>
-    <div class="input-group">
-      <label>Civils :</label>
-      <input type="number" id="nb-civils" value="3" min="1">
+    <h2>Configuration</h2>
+
+    <button type="button" class="btn-toggle" id="mode-toggle-btn" onclick="toggleDistributionMode()">
+      🎲 Mode : Attribution Automatique
+    </button>
+
+    <!-- Option A : Mode Automatique -->
+    <div id="auto-settings">
+      <div class="input-group">
+        <label>Nombre total de joueurs :</label>
+        <input type="number" id="total-auto-players" value="5" min="3" max="20" onchange="updateAutoPreview()">
+      </div>
+      <div class="badge" id="auto-preview-badge">Civils : 3 | Undercover : 1 | Mr. White : 1</div>
     </div>
-    <div class="input-group">
-      <label>Undercovers :</label>
-      <input type="number" id="nb-undercovers" value="1" min="0">
+
+    <!-- Option B : Mode Manuel -->
+    <div id="manual-settings" class="hidden">
+      <div class="input-group">
+        <label>Civils :</label>
+        <input type="number" id="nb-civils" value="3" min="1">
+      </div>
+      <div class="input-group">
+        <label>Undercovers :</label>
+        <input type="number" id="nb-undercovers" value="1" min="0">
+      </div>
+      <div class="input-group">
+        <label>Mr. White :</label>
+        <input type="number" id="nb-whites" value="1" min="0">
+      </div>
     </div>
-    <div class="input-group">
-      <label>Mr. White :</label>
-      <input type="number" id="nb-whites" value="1" min="0">
-    </div>
+
     <button onclick="goToNamesScreen()">Suivant : Nommer les joueurs</button>
     <button class="btn-secondary" onclick="showScoreboard(true)">🏆 Tableau des Scores</button>
   </div>
@@ -165,18 +194,18 @@
   <!-- 7. Devinette Mr. White -->
   <div class="card hidden" id="white-guess-screen">
     <h2 class="white-role">Dernière chance Mr. White !</h2>
-    <p><strong id="white-player-name"></strong> peut voler la victoire (+10 pts) en trouvant le mot des Civils :</p>
+    <p><strong id="white-player-name"></strong> peut voler la victoire (+10 pts) en devinant le mot des Civils :</p>
     <input type="text" id="white-guess-input" placeholder="Tapez le mot secret des civils">
     <button onclick="checkWhiteGuess()">Valider la tentative</button>
   </div>
 
-  <!-- 8. Fin de manche et Tableau des scores -->
+  <!-- 8. Tableau des scores -->
   <div class="card hidden" id="scoreboard-screen">
     <h2 id="winner-title">Fin de Manche</h2>
     <p id="winner-desc"></p>
     <table class="score-table">
       <thead>
-        <tr><th>Joueur</th><th>Score Global</th></tr>
+        <tr><th>Joueur</th><th>Score</th></tr>
       </thead>
       <tbody id="score-table-body"></tbody>
     </table>
@@ -198,11 +227,62 @@
       { civil: "Soleil", undercover: "Lune" }
     ];
 
+    let isAutoMode = true;
+    let counts = { civils: 3, undercovers: 1, whites: 1 };
     let currentPair = null;
     let players = [];
     let currentPlayerIndex = 0;
     let eliminatedPlayer = null;
     let totalPlayersCount = 0;
+
+    // Calcul de l'équilibrage automatique
+    function calculateAutoRoles(total) {
+      if (total <= 3) return { civils: 2, undercovers: 1, whites: 0 };
+      if (total === 4) return { civils: 3, undercovers: 1, whites: 0 };
+      if (total === 5) return { civils: 3, undercovers: 1, whites: 1 };
+      if (total === 6) return { civils: 4, undercovers: 1, whites: 1 };
+      if (total <= 8) return { civils: total - 3, undercovers: 2, whites: 1 };
+      
+      const whites = Math.random() > 0.4 ? 1 : 2;
+      const undercovers = Math.max(2, Math.floor(total * 0.25));
+      const civils = total - undercovers - whites;
+      return { civils, undercovers, whites };
+    }
+
+    function toggleDistributionMode() {
+      isAutoMode = !isAutoMode;
+      const toggleBtn = document.getElementById("mode-toggle-btn");
+      const autoSection = document.getElementById("auto-settings");
+      const manualSection = document.getElementById("manual-settings");
+
+      if (isAutoMode) {
+        toggleBtn.innerText = "🎲 Mode : Attribution Automatique";
+        toggleBtn.style.background = "#fab387";
+        autoSection.classList.remove("hidden");
+        manualSection.classList.add("hidden");
+        updateAutoPreview();
+      } else {
+        toggleBtn.innerText = "✏️ Mode : Répartition Manuelle";
+        toggleBtn.style.background = "#89dceb";
+        autoSection.classList.add("hidden");
+        manualSection.classList.remove("hidden");
+      }
+    }
+
+    function updateAutoPreview() {
+      const total = parseInt(document.getElementById("total-auto-players").value) || 5;
+      const preview = calculateAutoRoles(total);
+      document.getElementById("auto-preview-badge").innerText = 
+        `Civils : ${preview.civils} | Undercover : ${preview.undercovers} | Mr. White : ${preview.whites}`;
+    }
+
+    function hideAllScreens() {
+      const screens = [
+        "setup-screen", "names-screen", "pass-screen", "reveal-screen", 
+        "vote-screen", "eliminated-screen", "white-guess-screen", "scoreboard-screen"
+      ];
+      screens.forEach(id => document.getElementById(id).classList.add("hidden"));
+    }
 
     function getScores() {
       return JSON.parse(localStorage.getItem("undercover_scores")) || {};
@@ -218,20 +298,17 @@
       saveScores(scores);
     }
 
-    function hideAllScreens() {
-      const screens = [
-        "setup-screen", "names-screen", "pass-screen", "reveal-screen", 
-        "vote-screen", "eliminated-screen", "white-guess-screen", "scoreboard-screen"
-      ];
-      screens.forEach(id => document.getElementById(id).classList.add("hidden"));
-    }
-
     function goToNamesScreen() {
-      const civilsCount = parseInt(document.getElementById("nb-civils").value) || 0;
-      const undercoversCount = parseInt(document.getElementById("nb-undercovers").value) || 0;
-      const whitesCount = parseInt(document.getElementById("nb-whites").value) || 0;
+      if (isAutoMode) {
+        totalPlayersCount = parseInt(document.getElementById("total-auto-players").value) || 5;
+        counts = calculateAutoRoles(totalPlayersCount);
+      } else {
+        counts.civils = parseInt(document.getElementById("nb-civils").value) || 0;
+        counts.undercovers = parseInt(document.getElementById("nb-undercovers").value) || 0;
+        counts.whites = parseInt(document.getElementById("nb-whites").value) || 0;
+        totalPlayersCount = counts.civils + counts.undercovers + counts.whites;
+      }
 
-      totalPlayersCount = civilsCount + undercoversCount + whitesCount;
       if (totalPlayersCount < 3) {
         alert("Il faut au minimum 3 joueurs au total.");
         return;
@@ -255,10 +332,6 @@
     }
 
     function startGame() {
-      const civilsCount = parseInt(document.getElementById("nb-civils").value) || 0;
-      const undercoversCount = parseInt(document.getElementById("nb-undercovers").value) || 0;
-      const whitesCount = parseInt(document.getElementById("nb-whites").value) || 0;
-
       const enteredNames = [];
       for (let i = 1; i <= totalPlayersCount; i++) {
         const val = document.getElementById(`player-name-input-${i}`).value.trim();
@@ -267,7 +340,6 @@
 
       localStorage.setItem("undercover_players", JSON.stringify(enteredNames));
 
-      // Initialiser le score pour les nouveaux joueurs s'ils n'existent pas
       const currentScores = getScores();
       enteredNames.forEach(name => {
         if (currentScores[name] === undefined) currentScores[name] = 0;
@@ -277,10 +349,11 @@
       currentPair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
 
       let roleDeck = [];
-      for (let i = 0; i < civilsCount; i++) roleDeck.push({ type: "civil", word: currentPair.civil });
-      for (let i = 0; i < undercoversCount; i++) roleDeck.push({ type: "undercover", word: currentPair.undercover });
-      for (let i = 0; i < whitesCount; i++) roleDeck.push({ type: "white", word: null });
+      for (let i = 0; i < counts.civils; i++) roleDeck.push({ type: "civil", word: currentPair.civil });
+      for (let i = 0; i < counts.undercovers; i++) roleDeck.push({ type: "undercover", word: currentPair.undercover });
+      for (let i = 0; i < counts.whites; i++) roleDeck.push({ type: "white", word: null });
 
+      // Mélange complet et aléatoire
       roleDeck.sort(() => Math.random() - 0.5);
 
       players = enteredNames.map((name, index) => ({
@@ -388,7 +461,7 @@
 
       if (guess === actualWord) {
         addPoints(eliminatedPlayer.name, 10);
-        showScoreboard(false, `${eliminatedPlayer.name} (Mr. White) gagne la manche !`, `Devinette réussie ("${currentPair.civil}") ! Il remporte +10 points.`);
+        showScoreboard(false, `${eliminatedPlayer.name} (Mr. White) gagne la manche !`, `Devinette réussie ("${currentPair.civil}") ! +10 points.`);
       } else {
         alert(`Mauvais mot ! Le mot civil était "${currentPair.civil}".`);
         checkGameState();
@@ -400,22 +473,20 @@
       const civilsAlive = alivePlayers.filter(p => p.type === 'civil').length;
       const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
 
-      // Victoire des Civils
       if (impostorsAlive === 0) {
         players.forEach(p => {
           if (p.type === "civil") addPoints(p.name, p.alive ? 2 : 1);
         });
-        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs ont été éliminés (+2 pts aux survivants, +1 pt aux éliminés).`);
+        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs sont éliminés (+2 pts aux survivants, +1 pt aux éliminés).`);
         return;
       }
 
-      // Victoire des Imposteurs (quand il reste moins ou autant de civils que d'imposteurs)
       if (impostorsAlive > civilsAlive || civilsAlive <= 1) {
         players.forEach(p => {
           if (p.type === "undercover") addPoints(p.name, p.alive ? 6 : 3);
           if (p.type === "white" && p.alive) addPoints(p.name, 6);
         });
-        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs remportent la manche (+6 pts aux survivants).`);
+        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs ont gagné (+6 pts aux survivants).`);
         return;
       }
 
@@ -431,7 +502,6 @@
       const tbody = document.getElementById("score-table-body");
       tbody.innerHTML = "";
 
-      // Tri des joueurs par score décroissant
       const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
 
       sorted.forEach(([name, score]) => {
@@ -449,11 +519,14 @@
     }
 
     function resetAllScores() {
-      if (confirm("Réinitialiser tous les scores de tous les joueurs à 0 ?")) {
+      if (confirm("Remettre tous les scores à zéro ?")) {
         localStorage.removeItem("undercover_scores");
-        showScoreboard(true, "Scores réinitialisés", "Tous les compteurs sont à 0.");
+        showScoreboard(true, "Scores réinitialisés", "Compteurs remis à zéro.");
       }
     }
+
+    // Initialisation au chargement
+    updateAutoPreview();
   </script>
 </body>
 </html>
