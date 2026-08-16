@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Undercover - Rôles Aléatoires & Auto</title>
+  <title>Undercover - Choix Auto & Manuel</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -26,11 +26,36 @@
       width: 100%;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
+    .tab-container {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: #181825;
+      padding: 4px;
+      border-radius: 8px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 8px 10px;
+      font-size: 0.9rem;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #a6adc8;
+      cursor: pointer;
+      font-weight: bold;
+      margin: 0;
+      transition: all 0.2s;
+    }
+    .tab-btn.active {
+      background: #89b4fa;
+      color: #11111b;
+    }
     .input-group {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 10px 0;
+      margin: 12px 0;
     }
     input[type="number"], input[type="text"] {
       padding: 8px 12px;
@@ -68,12 +93,6 @@
     button:hover { background: #b4befe; }
     .btn-secondary { background: #45475a; color: #cdd6f4; }
     .btn-secondary:hover { background: #585b70; }
-    .btn-toggle {
-      background: #fab387;
-      color: #11111b;
-      margin-bottom: 15px;
-    }
-    .btn-toggle:hover { background: #f9e2af; }
     .hidden { display: none; }
     .secret-word {
       font-size: 1.6rem;
@@ -88,12 +107,12 @@
     .alive-count { font-size: 0.9rem; color: #bac2de; margin-bottom: 15px; }
     .badge {
       background: #181825;
-      padding: 6px 12px;
-      border-radius: 20px;
+      padding: 8px 12px;
+      border-radius: 6px;
       font-size: 0.85rem;
-      color: #a6adc8;
-      display: inline-block;
-      margin-bottom: 15px;
+      color: #fab387;
+      display: block;
+      margin: 10px 0 15px 0;
     }
     .score-table {
       width: 100%;
@@ -114,37 +133,40 @@
 </head>
 <body>
 
-  <!-- 1. Configuration des effectifs & Mode de répartition -->
+  <!-- 1. Configuration avec Choix du Mode -->
   <div class="card" id="setup-screen">
     <h2>Configuration</h2>
 
-    <button type="button" class="btn-toggle" id="mode-toggle-btn" onclick="toggleDistributionMode()">
-      🎲 Mode : Attribution Automatique
-    </button>
+    <!-- Onglets de choix de mode -->
+    <div class="tab-container">
+      <button class="tab-btn active" id="tab-auto" onclick="setMode('auto')">🎲 Automatique</button>
+      <button class="tab-btn" id="tab-manual" onclick="setMode('manual')">✏️ Manuel</button>
+    </div>
 
-    <!-- Option A : Mode Automatique -->
-    <div id="auto-settings">
+    <!-- Mode 1 : Automatique / Aléatoire -->
+    <div id="mode-auto-view">
       <div class="input-group">
         <label>Nombre total de joueurs :</label>
-        <input type="number" id="total-auto-players" value="5" min="3" max="20" onchange="updateAutoPreview()">
+        <input type="number" id="total-auto-players" value="5" min="3" max="20" oninput="updateAutoPreview()">
       </div>
       <div class="badge" id="auto-preview-badge">Civils : 3 | Undercover : 1 | Mr. White : 1</div>
     </div>
 
-    <!-- Option B : Mode Manuel -->
-    <div id="manual-settings" class="hidden">
+    <!-- Mode 2 : Manuel -->
+    <div id="mode-manual-view" class="hidden">
       <div class="input-group">
         <label>Civils :</label>
-        <input type="number" id="nb-civils" value="3" min="1">
+        <input type="number" id="nb-civils" value="3" min="1" oninput="updateManualTotal()">
       </div>
       <div class="input-group">
         <label>Undercovers :</label>
-        <input type="number" id="nb-undercovers" value="1" min="0">
+        <input type="number" id="nb-undercovers" value="1" min="0" oninput="updateManualTotal()">
       </div>
       <div class="input-group">
         <label>Mr. White :</label>
-        <input type="number" id="nb-whites" value="1" min="0">
+        <input type="number" id="nb-whites" value="1" min="0" oninput="updateManualTotal()">
       </div>
+      <div class="badge" id="manual-total-badge">Total : 5 joueurs</div>
     </div>
 
     <button onclick="goToNamesScreen()">Suivant : Nommer les joueurs</button>
@@ -227,7 +249,7 @@
       { civil: "Soleil", undercover: "Lune" }
     ];
 
-    let isAutoMode = true;
+    let currentMode = "auto"; // "auto" ou "manual"
     let counts = { civils: 3, undercovers: 1, whites: 1 };
     let currentPair = null;
     let players = [];
@@ -235,7 +257,29 @@
     let eliminatedPlayer = null;
     let totalPlayersCount = 0;
 
-    // Calcul de l'équilibrage automatique
+    // Basculement entre onglets Auto et Manuel
+    function setMode(mode) {
+      currentMode = mode;
+      const tabAuto = document.getElementById("tab-auto");
+      const tabManual = document.getElementById("tab-manual");
+      const viewAuto = document.getElementById("mode-auto-view");
+      const viewManual = document.getElementById("mode-manual-view");
+
+      if (mode === "auto") {
+        tabAuto.classList.add("active");
+        tabManual.classList.remove("active");
+        viewAuto.classList.remove("hidden");
+        viewManual.classList.add("hidden");
+        updateAutoPreview();
+      } else {
+        tabManual.classList.add("active");
+        tabAuto.classList.remove("active");
+        viewManual.classList.remove("hidden");
+        viewAuto.classList.add("hidden");
+        updateManualTotal();
+      }
+    }
+
     function calculateAutoRoles(total) {
       if (total <= 3) return { civils: 2, undercovers: 1, whites: 0 };
       if (total === 4) return { civils: 3, undercovers: 1, whites: 0 };
@@ -249,31 +293,18 @@
       return { civils, undercovers, whites };
     }
 
-    function toggleDistributionMode() {
-      isAutoMode = !isAutoMode;
-      const toggleBtn = document.getElementById("mode-toggle-btn");
-      const autoSection = document.getElementById("auto-settings");
-      const manualSection = document.getElementById("manual-settings");
-
-      if (isAutoMode) {
-        toggleBtn.innerText = "🎲 Mode : Attribution Automatique";
-        toggleBtn.style.background = "#fab387";
-        autoSection.classList.remove("hidden");
-        manualSection.classList.add("hidden");
-        updateAutoPreview();
-      } else {
-        toggleBtn.innerText = "✏️ Mode : Répartition Manuelle";
-        toggleBtn.style.background = "#89dceb";
-        autoSection.classList.add("hidden");
-        manualSection.classList.remove("hidden");
-      }
-    }
-
     function updateAutoPreview() {
       const total = parseInt(document.getElementById("total-auto-players").value) || 5;
       const preview = calculateAutoRoles(total);
       document.getElementById("auto-preview-badge").innerText = 
         `Civils : ${preview.civils} | Undercover : ${preview.undercovers} | Mr. White : ${preview.whites}`;
+    }
+
+    function updateManualTotal() {
+      const c = parseInt(document.getElementById("nb-civils").value) || 0;
+      const u = parseInt(document.getElementById("nb-undercovers").value) || 0;
+      const w = parseInt(document.getElementById("nb-whites").value) || 0;
+      document.getElementById("manual-total-badge").innerText = `Total : ${c + u + w} joueur(s)`;
     }
 
     function hideAllScreens() {
@@ -299,7 +330,7 @@
     }
 
     function goToNamesScreen() {
-      if (isAutoMode) {
+      if (currentMode === "auto") {
         totalPlayersCount = parseInt(document.getElementById("total-auto-players").value) || 5;
         counts = calculateAutoRoles(totalPlayersCount);
       } else {
@@ -310,7 +341,7 @@
       }
 
       if (totalPlayersCount < 3) {
-        alert("Il faut au minimum 3 joueurs au total.");
+        alert("Il faut au minimum 3 joueurs au total pour lancer la partie.");
         return;
       }
 
@@ -353,7 +384,6 @@
       for (let i = 0; i < counts.undercovers; i++) roleDeck.push({ type: "undercover", word: currentPair.undercover });
       for (let i = 0; i < counts.whites; i++) roleDeck.push({ type: "white", word: null });
 
-      // Mélange complet et aléatoire
       roleDeck.sort(() => Math.random() - 0.5);
 
       players = enteredNames.map((name, index) => ({
@@ -525,8 +555,9 @@
       }
     }
 
-    // Initialisation au chargement
+    // Initialisation
     updateAutoPreview();
+    updateManualTotal();
   </script>
 </body>
 </html>
