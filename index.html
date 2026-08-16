@@ -62,20 +62,20 @@
     }
 
     .brand {
-    font-weight: 800;
-    font-size: 1.35rem;
-    letter-spacing: -0.5px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: #ffffff; /* Couleur de secours nette */
+      font-weight: 800;
+      font-size: 1.35rem;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #ffffff;
     }
 
     .brand-text {
-    background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    color: #818cf8; /* Fallback si le gradient n'est pas supporté */
+      background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: #818cf8;
     }
 
     main {
@@ -200,7 +200,6 @@
       color: var(--text-main);
     }
 
-    /* Correctif complet pour inputs et sélecteurs déroulants */
     input[type="number"], input[type="text"], select {
       background-color: var(--input-bg);
       border: 1px solid var(--border);
@@ -212,7 +211,6 @@
       transition: all 0.2s;
     }
 
-    /* Custom Select avec flèche SVG nette */
     select {
       appearance: none;
       -webkit-appearance: none;
@@ -225,7 +223,6 @@
       padding-right: 40px;
     }
 
-    /* Options visibles sur tous les systèmes */
     select option {
       background-color: var(--select-option-bg);
       color: #ffffff;
@@ -239,9 +236,7 @@
       font-weight: 700;
     }
 
-    input[type="text"] {
-      width: 100%;
-    }
+    input[type="text"] { width: 100%; }
 
     input:focus, select:focus {
       border-color: var(--border-focus);
@@ -370,6 +365,7 @@
       font-size: 1.05rem;
     }
 
+    /* Tableau des scores et Récapitulatif */
     .scoreboard-table {
       width: 100%;
       border-collapse: collapse;
@@ -401,6 +397,24 @@
       color: var(--accent-amber);
     }
 
+    .recap-box {
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin: 1.5rem 0;
+      text-align: left;
+    }
+
+    .recap-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    .recap-item:last-child { border-bottom: none; }
+
     .hidden { display: none !important; }
   </style>
 </head>
@@ -408,11 +422,11 @@
 
   <header>
     <div class="brand">
-        <span>🕵️</span>
-        <span class="brand-text">Undercover</span>
+      <span>🕵️</span>
+      <span class="brand-text">Undercover</span>
     </div>
     <button class="btn-secondary" onclick="showScoreboard(true)" style="padding: 8px 16px; font-size: 0.85rem;">🏆 Scores</button>
-    </header>
+  </header>
 
   <main>
     <!-- 1. CONFIGURATION -->
@@ -567,7 +581,7 @@
       </div>
     </div>
 
-    <!-- 8. ÉLIMINATION -->
+    <!-- 8. ÉLIMINATION (Sans afficher le mot !) -->
     <div class="screen-container hidden" id="eliminated-screen">
       <div class="panel" style="text-align: center; padding: 3rem 2rem;">
         <h1 id="elim-title">Élimination</h1>
@@ -580,7 +594,7 @@
     <div class="screen-container hidden" id="white-guess-screen">
       <div class="panel" style="text-align: center; padding: 3rem 2rem;">
         <h1 style="color: var(--accent-pink);">Dernière Chance !</h1>
-        <p class="subtitle"><strong id="white-player-name"></strong> peut voler la victoire (+10 pts) en devinant le mot des Civils :</p>
+        <p class="subtitle"><strong id="white-player-name"></strong> peut tenter de voler la victoire (+10 pts) en devinant le mot des Civils :</p>
         <div style="max-width: 400px; margin: 2rem auto;">
           <input type="text" id="white-guess-input" placeholder="Tapez le mot civil ici..." style="font-size: 1.1rem; text-align: center;">
           <button class="btn-primary" onclick="checkWhiteGuess()" style="width: 100%; margin-top: 1rem;">Valider la devinette</button>
@@ -588,13 +602,19 @@
       </div>
     </div>
 
-    <!-- 10. SCOREBOARD -->
+    <!-- 10. SCOREBOARD & RÉCAPITULATIF DE FIN -->
     <div class="screen-container hidden" id="scoreboard-screen">
       <h1 id="winner-title">Fin de Manche</h1>
       <p class="subtitle" id="winner-desc"></p>
       
-      <div class="panel">
-        <h2>Classement</h2>
+      <!-- Récapitulatif des mots et rôles (Révélé uniquement à la fin) -->
+      <div class="panel" id="endgame-recap-panel">
+        <h2>🔍 Révélation des Mots & Rôles</h2>
+        <div class="recap-box" id="recap-box-content"></div>
+      </div>
+
+      <div class="panel" style="margin-top: 1.5rem;">
+        <h2>Classement Général</h2>
         <table class="scoreboard-table">
           <thead>
             <tr><th>Joueur</th><th>Score</th></tr>
@@ -831,7 +851,7 @@
 
       powerDisplay.innerHTML = "";
       if (current.power === "mayor") {
-        powerDisplay.innerHTML = `<div class="power-tag">👑 Rôle Spécial : Le Maire (Vote double)</div>`;
+        powerDisplay.innerHTML = `<div class="power-tag">👑 Rôle Spécial : Le Maire (Vote compte double)</div>`;
       } else if (current.power === "shield") {
         powerDisplay.innerHTML = `<div class="power-tag">🛡️ Rôle Spécial : Le Bouclier (Survit à 1 élimination)</div>`;
       } else if (current.power === "mute") {
@@ -946,6 +966,7 @@
       handleElimination(eliminated);
     }
 
+    // Élimination sans spoiler le mot
     function handleElimination(player) {
       if (player.hasShield) {
         player.hasShield = false;
@@ -959,22 +980,14 @@
 
       hideAllScreens();
       document.getElementById("elim-title").innerText = `${player.name} a été éliminé(e) !`;
-
-      let roleText = "";
-      if (player.type === "civil") roleText = `C'était un Civil (Mot : "${player.word}").`;
-      if (player.type === "undercover") roleText = `C'était un Undercover (Mot : "${player.word}").`;
-      if (player.type === "white") roleText = `C'était Mr. White !`;
-
-      if (player.power) {
-        const map = { mayor: "Le Maire 👑", shield: "Le Bouclier 🛡️", mute: "Le Muet 🤐" };
-        roleText += ` (${map[player.power]})`;
-      }
-
-      document.getElementById("elim-desc").innerText = roleText;
+      
+      // On n'affiche PAS le mot ici, le suspense reste entier
+      document.getElementById("elim-desc").innerText = `Son rôle et son mot secret seront révélés à la fin de la partie.`;
       document.getElementById("eliminated-screen").classList.remove("hidden");
     }
 
     function continueAfterElimination() {
+      // Si Mr. White est éliminé, on lui donne sa chance de deviner
       if (eliminatedPlayer.type === "white") {
         hideAllScreens();
         document.getElementById("white-player-name").innerText = eliminatedPlayer.name;
@@ -991,9 +1004,9 @@
 
       if (guess === actualWord) {
         addPoints(eliminatedPlayer.name, 10);
-        showScoreboard(false, `${eliminatedPlayer.name} vole la victoire !`, `Devinette réussie ("${currentPair.civil}"). +10 points !`);
+        showScoreboard(false, `${eliminatedPlayer.name} (Mr. White) vole la victoire !`, `Devinette réussie ! Il remporte +10 points.`);
       } else {
-        alert(`Mauvais mot ! Le mot civil était "${currentPair.civil}".`);
+        alert(`Mauvaise devinette ! ${eliminatedPlayer.name} quitte la partie.`);
         checkGameState();
       }
     }
@@ -1007,7 +1020,7 @@
         players.forEach(p => {
           if (p.type === "civil") addPoints(p.name, p.alive ? 2 : 1);
         });
-        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs sont éliminés (+2 pts aux survivants).`);
+        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs ont été démasqués (+2 pts aux survivants).`);
         return;
       }
 
@@ -1016,17 +1029,55 @@
           if (p.type === "undercover") addPoints(p.name, p.alive ? 6 : 3);
           if (p.type === "white" && p.alive) addPoints(p.name, 6);
         });
-        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs remportent la manche (+6 pts).`);
+        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs remportent la manche (+6 pts aux survivants).`);
         return;
       }
 
       startNewSpeechRound();
     }
 
+    // Affichage des scores et RÉVÉLATION FINALE de tous les mots
     function showScoreboard(fromMenu = false, title = "Tableau des Scores", desc = "") {
       hideAllScreens();
       document.getElementById("winner-title").innerText = title;
       document.getElementById("winner-desc").innerText = desc;
+
+      const recapPanel = document.getElementById("endgame-recap-panel");
+      const recapBox = document.getElementById("recap-box-content");
+
+      if (fromMenu || !currentPair) {
+        recapPanel.classList.add("hidden");
+      } else {
+        recapPanel.classList.remove("hidden");
+        
+        let html = `
+          <div style="margin-bottom: 12px; font-size: 1.05rem;">
+            <div>🧑‍🌾 <strong>Mot des Civils :</strong> <span style="color:var(--accent-green); font-weight:800;">${currentPair.civil}</span></div>
+            <div style="margin-top:4px;">🕵️ <strong>Mot des Undercovers :</strong> <span style="color:var(--accent-pink); font-weight:800;">${currentPair.undercover}</span></div>
+          </div>
+          <hr style="border:0; border-top:1px solid var(--border); margin:12px 0;">
+        `;
+
+        players.forEach(p => {
+          let roleName = p.type === 'civil' ? 'Civil' : (p.type === 'undercover' ? 'Undercover' : 'Mr. White');
+          let wordStr = p.type === 'white' ? 'Aucun mot' : `"${p.word}"`;
+          let powerStr = p.power ? ` | ⚡ ${p.power}` : '';
+
+          html += `
+            <div class="recap-item">
+              <div>
+                <strong>${p.name}</strong> 
+                <span style="font-size:0.85rem; color:var(--text-muted);">(${p.alive ? 'En vie' : 'Éliminé'})</span>
+              </div>
+              <div style="text-align:right;">
+                <span style="color:#818cf8; font-weight:700;">${roleName}</span> : <em>${wordStr}</em>${powerStr}
+              </div>
+            </div>
+          `;
+        });
+
+        recapBox.innerHTML = html;
+      }
 
       const scores = getScores();
       const tbody = document.getElementById("score-table-body");
@@ -1050,7 +1101,7 @@
     function resetAllScores() {
       if (confirm("Remettre les scores de tous les joueurs à zéro ?")) {
         localStorage.removeItem("undercover_scores");
-        showScoreboard(true, "Scores réinitialisés", "Compteurs remis à zéro.");
+        showScoreboard(true, "Scores réinitialisés", "Tous les compteurs sont à 0.");
       }
     }
 
