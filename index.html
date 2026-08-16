@@ -3,38 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Undercover - Full Experience</title>
+  <title>Undercover - Multijoueur En Ligne</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Librairie WebRTC PeerJS gratuite -->
+  <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
     :root {
       --bg: #0b0f19;
       --bg-panel: rgba(17, 24, 39, 0.85);
-      --bg-panel-solid: #111827;
       --border: rgba(255, 255, 255, 0.12);
-      --border-focus: rgba(99, 102, 241, 0.8);
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --primary-glow: rgba(99, 102, 241, 0.35);
       --accent-green: #10b981;
       --accent-pink: #f43f5e;
       --accent-amber: #f59e0b;
-      --accent-purple: #a855f7;
       --text-main: #f9fafb;
       --text-muted: #9ca3af;
       --input-bg: #151d30;
       --select-option-bg: #1e293b;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      -webkit-tap-highlight-color: transparent;
-    }
-
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', sans-serif; }
     body {
       background-color: var(--bg);
       background-image: 
@@ -51,7 +43,6 @@
       padding: 1.25rem 2rem;
       border-bottom: 1px solid var(--border);
       backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
       background: rgba(11, 15, 25, 0.85);
       display: flex;
       justify-content: space-between;
@@ -61,27 +52,13 @@
       z-index: 50;
     }
 
-    .brand {
-      font-weight: 800;
-      font-size: 1.35rem;
-      letter-spacing: -0.5px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: #ffffff;
-    }
-
-    .brand-text {
-      background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      color: #818cf8;
-    }
+    .brand { font-weight: 800; font-size: 1.35rem; display: flex; align-items: center; gap: 8px; color: #fff; }
+    .brand-text { background: linear-gradient(135deg, #818cf8, #c084fc); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
     main {
       flex: 1;
       width: 100%;
-      max-width: 1100px;
+      max-width: 900px;
       margin: 0 auto;
       padding: 2rem 1.25rem;
       display: flex;
@@ -89,166 +66,73 @@
       justify-content: center;
     }
 
-    .screen-container {
-      width: 100%;
-      animation: fadeIn 0.25s ease-out;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 1.5rem;
-      margin-top: 1.5rem;
-    }
-
-    .grid-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 1rem;
-      margin: 1.5rem 0;
-      max-height: 50vh;
-      overflow-y: auto;
-      padding-right: 6px;
-      -webkit-overflow-scrolling: touch;
-    }
-
-    .grid-cards::-webkit-scrollbar,
-    .name-inputs-list::-webkit-scrollbar {
-      width: 6px;
-    }
-    .grid-cards::-webkit-scrollbar-thumb,
-    .name-inputs-list::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 4px;
-    }
+    .screen-container { width: 100%; animation: fadeIn 0.25s ease-out; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
     .panel {
       background: var(--bg-panel);
       backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border: 1px solid var(--border);
       border-radius: 20px;
       padding: 1.75rem;
+      margin-bottom: 1.5rem;
     }
 
-    h1 {
+    h1 { font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; }
+    h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem; }
+    p.subtitle { color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+    .room-code-badge {
       font-size: 2.2rem;
       font-weight: 800;
-      letter-spacing: -0.5px;
-      margin-bottom: 0.5rem;
-    }
-
-    h2 {
-      font-size: 1.4rem;
-      font-weight: 700;
-      margin-bottom: 1rem;
-    }
-
-    p.subtitle {
-      color: var(--text-muted);
-      font-size: 0.95rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .tab-container {
-      display: flex;
+      letter-spacing: 4px;
+      color: var(--accent-amber);
       background: var(--input-bg);
-      padding: 6px;
+      border: 1px dashed var(--accent-amber);
+      padding: 10px 20px;
       border-radius: 14px;
-      gap: 6px;
+      display: inline-block;
+      margin: 10px 0 20px 0;
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .player-card {
+      background: var(--input-bg);
       border: 1px solid var(--border);
-      margin-bottom: 1.5rem;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 12px;
-      font-size: 0.9rem;
-      font-weight: 700;
-      border-radius: 10px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-
-    .tab-btn.active {
-      background: var(--primary);
-      color: #fff;
-      box-shadow: 0 4px 14px var(--primary-glow);
-    }
-
-    .input-row {
+      padding: 1rem;
+      border-radius: 14px;
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background: var(--input-bg);
-      padding: 1rem 1.25rem;
-      border-radius: 14px;
-      margin-bottom: 0.75rem;
-      border: 1px solid var(--border);
+      gap: 10px;
+      font-weight: 700;
     }
 
-    .input-row label {
-      font-weight: 600;
-      color: var(--text-main);
+    .avatar-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--accent-green);
     }
 
-    input[type="number"], input[type="text"], select {
+    input[type="text"] {
       background-color: var(--input-bg);
       border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 12px 14px;
-      border-radius: 10px;
-      font-size: 0.95rem;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 1rem;
+      width: 100%;
       outline: none;
-      transition: all 0.2s;
+      margin-bottom: 12px;
     }
 
-    select {
-      appearance: none;
-      -webkit-appearance: none;
-      -moz-appearance: none;
-      cursor: pointer;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 14px center;
-      background-size: 16px;
-      padding-right: 40px;
-    }
-
-    select option {
-      background-color: var(--select-option-bg);
-      color: #ffffff;
-      padding: 12px;
-      font-size: 0.95rem;
-    }
-
-    input[type="number"] {
-      width: 80px;
-      text-align: center;
-      font-weight: 700;
-    }
-
-    input[type="text"] { width: 100%; }
-
-    input:focus, select:focus {
-      border-color: var(--border-focus);
-      background-color: #1e293b;
-    }
-
-    .btn-group {
-      display: flex;
-      gap: 1rem;
-      margin-top: 1.5rem;
-      flex-wrap: wrap;
-    }
+    input:focus, select:focus { border-color: var(--primary); }
 
     button.btn-primary {
       background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
@@ -260,38 +144,34 @@
       border-radius: 14px;
       cursor: pointer;
       box-shadow: 0 8px 24px var(--primary-glow);
-      transition: transform 0.15s, box-shadow 0.15s;
-      flex: 1;
-      min-width: 200px;
+      width: 100%;
+      margin-top: 10px;
     }
-
-    button.btn-primary:active { transform: scale(0.98); }
 
     button.btn-secondary {
       background: var(--input-bg);
       color: var(--text-main);
       border: 1px solid var(--border);
-      padding: 1rem 1.75rem;
+      padding: 1rem 2rem;
       font-size: 1rem;
       font-weight: 600;
       border-radius: 14px;
       cursor: pointer;
-      transition: background 0.2s;
+      width: 100%;
+      margin-top: 10px;
     }
 
-    button.btn-secondary:hover { background: #1e293b; }
-
     .reveal-card {
-      background: radial-gradient(circle at center, rgba(16, 185, 129, 0.12) 0%, rgba(17, 24, 39, 0.8) 100%);
+      background: radial-gradient(circle at center, rgba(16, 185, 129, 0.15) 0%, rgba(17, 24, 39, 0.8) 100%);
       border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 3.5rem 2rem;
-      border-radius: 28px;
+      padding: 3rem 1.5rem;
+      border-radius: 24px;
       text-align: center;
       margin: 1.5rem 0;
     }
 
     .reveal-card.white-role {
-      background: radial-gradient(circle at center, rgba(244, 63, 94, 0.12) 0%, rgba(17, 24, 39, 0.8) 100%);
+      background: radial-gradient(circle at center, rgba(244, 63, 94, 0.15) 0%, rgba(17, 24, 39, 0.8) 100%);
       border-color: rgba(244, 63, 94, 0.3);
     }
 
@@ -299,129 +179,48 @@
       font-size: 3rem;
       font-weight: 800;
       color: var(--accent-green);
-      letter-spacing: -1px;
-      text-shadow: 0 0 35px rgba(16, 185, 129, 0.4);
-      margin: 1rem 0;
+      margin: 10px 0;
     }
 
-    .white-role .secret-word-display {
-      color: var(--accent-pink);
-      text-shadow: 0 0 35px rgba(244, 63, 94, 0.4);
-    }
-
-    .power-tag {
-      background: rgba(168, 85, 247, 0.15);
-      border: 1px solid rgba(168, 85, 247, 0.3);
-      color: #d8b4fe;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      display: inline-block;
-      margin-top: 6px;
-    }
-
-    .order-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 1rem;
-      margin: 1.5rem 0;
-    }
+    .white-role .secret-word-display { color: var(--accent-pink); }
 
     .order-card {
       background: var(--input-bg);
       border: 1px solid var(--border);
-      padding: 1.25rem;
-      border-radius: 16px;
+      padding: 1rem;
+      border-radius: 14px;
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 12px;
+      margin-bottom: 8px;
     }
 
-    .order-badge {
+    .order-num {
       background: var(--primary);
-      color: #fff;
-      width: 36px;
-      height: 36px;
-      border-radius: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
     }
 
-    .vote-card {
+    .vote-btn-player {
       background: var(--input-bg);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-
-    .vote-card span {
+      color: #fff;
+      padding: 1rem;
+      border-radius: 12px;
+      font-size: 1rem;
       font-weight: 700;
-      font-size: 1.05rem;
-    }
-
-    .scoreboard-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1.5rem 0;
-      background: var(--input-bg);
-      border-radius: 16px;
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .scoreboard-table th, .scoreboard-table td {
-      padding: 1.25rem;
+      cursor: pointer;
       text-align: left;
-      border-bottom: 1px solid var(--border);
+      transition: all 0.2s;
     }
 
-    .scoreboard-table th {
-      text-transform: uppercase;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      letter-spacing: 0.5px;
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .scoreboard-table td:last-child {
-      text-align: right;
-      font-weight: 800;
-      font-size: 1.2rem;
-      color: var(--accent-amber);
-    }
-
-    .recap-box {
-      background: var(--input-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1.25rem;
-      margin: 1.5rem 0;
-      text-align: left;
-    }
-
-    .recap-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    .recap-item:last-child { border-bottom: none; }
-
-    .role-badge-revealed {
-      display: inline-block;
-      padding: 6px 14px;
-      border-radius: 8px;
-      font-weight: 800;
-      font-size: 1.1rem;
-      margin-top: 8px;
-    }
+    .vote-btn-player:hover { border-color: var(--accent-pink); background: rgba(244, 63, 94, 0.1); }
+    .vote-btn-player.selected { border-color: var(--accent-pink); background: var(--accent-pink); color: #111; }
 
     .hidden { display: none !important; }
   </style>
@@ -431,800 +230,460 @@
   <header>
     <div class="brand">
       <span>🕵️</span>
-      <span class="brand-text">Undercover</span>
+      <span class="brand-text">Undercover Live</span>
     </div>
-    <button class="btn-secondary" onclick="showScoreboard(true)" style="padding: 8px 16px; font-size: 0.85rem;">🏆 Scores</button>
+    <div id="room-status-badge" style="font-size: 0.85rem; color: var(--text-muted);">Mode Multijoueur</div>
   </header>
 
   <main>
-    <!-- 1. CONFIGURATION -->
-    <div class="screen-container" id="setup-screen">
-      <h1>Nouvelle Partie</h1>
-      <p class="subtitle">Ajustez les paramètres de la manche selon votre groupe.</p>
-
-      <div class="tab-container">
-        <button class="tab-btn active" id="tab-mystery" onclick="setMode('mystery')">❓ Mystère Total</button>
-        <button class="tab-btn" id="tab-auto" onclick="setMode('auto')">🎲 Équilibré</button>
-        <button class="tab-btn" id="tab-manual" onclick="setMode('manual')">✏️ Manuel</button>
-      </div>
-
-      <div class="grid-2">
-        <div class="panel">
-          <h2>Rôles & Effectifs</h2>
-
-          <div id="mode-mystery-view">
-            <div class="input-row">
-              <label>Nombre total de joueurs</label>
-              <input type="number" id="total-mystery-players" value="5" min="3" max="20">
-            </div>
-            <div class="power-tag" style="width: 100%; text-align: center; padding: 10px; margin-top: 10px;">
-              ❓ Rôles secrets imprévisibles (Undercovers et Mr. White aléatoires)
-            </div>
-          </div>
-
-          <div id="mode-auto-view" class="hidden">
-            <div class="input-row">
-              <label>Nombre total de joueurs</label>
-              <input type="number" id="total-auto-players" value="5" min="3" max="20" oninput="updateAutoPreview()">
-            </div>
-            <div class="power-tag" id="auto-preview-badge" style="width: 100%; text-align: center; padding: 10px; margin-top: 10px;">
-              Civils : 3 | Undercover : 1 | Mr. White : 1
-            </div>
-          </div>
-
-          <div id="mode-manual-view" class="hidden">
-            <div class="input-row">
-              <label>Civils</label>
-              <input type="number" id="nb-civils" value="3" min="1" oninput="updateManualTotal()">
-            </div>
-            <div class="input-row">
-              <label>Undercovers</label>
-              <input type="number" id="nb-undercovers" value="1" min="0" oninput="updateManualTotal()">
-            </div>
-            <div class="input-row">
-              <label>Mr. White</label>
-              <input type="number" id="nb-whites" value="1" min="0" oninput="updateManualTotal()">
-            </div>
-            <div class="power-tag" id="manual-total-badge" style="width: 100%; text-align: center; padding: 10px; margin-top: 10px;">
-              Total : 5 joueurs
-            </div>
-          </div>
-        </div>
-
-        <div class="panel">
-          <h2>Pouvoirs Secondaires</h2>
-          <div style="margin-bottom: 1.5rem;">
-            <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Attribution des rôles spéciaux</label>
-            <select id="secondary-roles-mode" onchange="toggleSecondarySettings()" style="width: 100%;">
-              <option value="none">Désactivés</option>
-              <option value="mystery" selected>❓ Mystère (distribution secrète)</option>
-              <option value="manual">✏️ Choix manuel précis</option>
-            </select>
-          </div>
-
-          <div id="manual-secondary-box" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
-            <label class="input-row" style="cursor: pointer;">
-              <span>👑 <strong>Le Maire</strong> (Vote double)</span>
-              <input type="checkbox" id="role-mayor">
-            </label>
-            <label class="input-row" style="cursor: pointer;">
-              <span>🛡️ <strong>Le Bouclier</strong> (Survit à 1 vote)</span>
-              <input type="checkbox" id="role-shield">
-            </label>
-            <label class="input-row" style="cursor: pointer;">
-              <span>🤐 <strong>Le Muet</strong> (Mime uniquement)</span>
-              <input type="checkbox" id="role-mute">
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="btn-group">
-        <button class="btn-primary" onclick="goToNamesScreen()">Nommer les participants →</button>
-      </div>
-    </div>
-
-    <!-- 2. SAISIE DES PRÉNOMS -->
-    <div class="screen-container hidden" id="names-screen">
-      <h1>Participants</h1>
-      <p class="subtitle">Indiquez les noms ou pseudos des joueurs pour cette manche.</p>
-      <div class="panel">
-        <div class="grid-cards" id="names-container"></div>
-      </div>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="startGame()">Distribuer les rôles →</button>
-        <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">← Retour</button>
-      </div>
-    </div>
-
-    <!-- 3. PASSAGE DU TÉLÉPHONE -->
-    <div class="screen-container hidden" id="pass-screen">
-      <div class="panel" style="text-align: center; padding: 4rem 2rem;">
-        <p class="subtitle" style="text-transform: uppercase; font-weight: 700;">Au tour de</p>
-        <h1 style="color: var(--primary); font-size: 3.5rem; margin-bottom: 1rem;" id="player-target-name">---</h1>
-        <p class="subtitle">Prenez l'appareil à l'abri des regards indiscrets.</p>
-        <button class="btn-primary" onclick="showRole()" style="max-width: 320px; margin: 2rem auto 0 auto;">Découvrir mon rôle</button>
-      </div>
-    </div>
-
-    <!-- 4. RÉVÉLATION SECRÈTE -->
-    <div class="screen-container hidden" id="reveal-screen">
+    <!-- 1. ACCUEIL MULTIJOUEUR -->
+    <div class="screen-container" id="lobby-menu">
       <div class="panel" style="text-align: center;">
-        <h2 id="reveal-header">Votre mot secret</h2>
-        <div class="reveal-card" id="reveal-card-box">
-          <div class="secret-word-display" id="word-display">---</div>
-          <div id="power-display"></div>
+        <h1>Jeu en Ligne</h1>
+        <p class="subtitle">Jouez chacun sur votre propre smartphone sans rien installer.</p>
+
+        <input type="text" id="player-nickname" placeholder="Votre prénom / pseudo..." maxlength="15">
+
+        <button class="btn-primary" onclick="initHost()">👑 Créer une salle (Hôte)</button>
+        <div style="margin: 15px 0; color: var(--text-muted); font-size: 0.9rem;">— OU REJOINDRE —</div>
+
+        <input type="text" id="join-room-code" placeholder="Code de la salle (ex: K8X2)" style="text-transform: uppercase; text-align: center;">
+        <button class="btn-secondary" onclick="joinRoom()">🔗 Rejoindre la partie</button>
+      </div>
+    </div>
+
+    <!-- 2. SALON D'ATTENTE (LOBBY) -->
+    <div class="screen-container hidden" id="room-lobby">
+      <div class="panel" style="text-align: center;">
+        <p class="subtitle" style="margin-bottom: 5px;">Code de la salle à partager :</p>
+        <div class="room-code-badge" id="display-room-code">----</div>
+        
+        <h2>Joueurs connectés (<span id="player-count">1</span>)</h2>
+        <div class="grid-cards" id="lobby-players-list"></div>
+
+        <div id="host-controls" class="hidden" style="margin-top: 1.5rem;">
+          <button class="btn-primary" onclick="startOnlineGame()">Lancer la partie 🚀</button>
         </div>
-        <p class="subtitle" id="role-hint">Mémorisez-le bien et restez discret.</p>
-        <button class="btn-primary" onclick="nextPlayer()" style="max-width: 320px; margin: 0 auto;">Cacher et passer →</button>
+        <p id="client-wait-msg" class="subtitle hidden">En attente que l'hôte lance la manche...</p>
       </div>
     </div>
 
-    <!-- 5. ORDRE DE PAROLE -->
-    <div class="screen-container hidden" id="debate-screen">
-      <h1>Tour de Table</h1>
-      <p class="subtitle">Donnez chacun un mot-indice à voix haute en suivant cet ordre :</p>
-      <div class="order-grid" id="speech-order-list"></div>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="openVotePhase()">Passer aux Votes et Accusations →</button>
+    <!-- 3. ÉCRAN RÔLE / MOT SECRET DU JOUEUR -->
+    <div class="screen-container hidden" id="game-role-screen">
+      <div class="panel" style="text-align: center;">
+        <h2>Votre Rôle Secret</h2>
+        <div class="reveal-card" id="role-card-box">
+          <div class="secret-word-display" id="my-secret-word">---</div>
+          <p id="my-role-hint" class="subtitle">Mémorisez votre mot !</p>
+        </div>
+        <p class="subtitle">Ne montrez pas votre écran aux autres participants.</p>
+        <div id="host-start-debate-btn" class="hidden">
+          <button class="btn-primary" onclick="broadcastStartDebate()">Lancer le tour de table →</button>
+        </div>
+        <p id="client-role-wait" class="subtitle">En attente du début des débats...</p>
       </div>
     </div>
 
-    <!-- 6. VOTE INDIVIDUEL -->
-    <div class="screen-container hidden" id="vote-screen">
-      <h1>Phase de Vote</h1>
-      <p class="subtitle">Chaque joueur sélectionne qui il souhaite accuser (ou vote blanc) :</p>
-      <div class="grid-cards" id="vote-inputs-container"></div>
-      <div class="btn-group">
-        <button class="btn-primary" onclick="processVotes()">Dépouiller le vote →</button>
-      </div>
-    </div>
-
-    <!-- 7. ÉGALITÉ -->
-    <div class="screen-container hidden" id="tie-screen">
-      <div class="panel" style="text-align: center; padding: 3rem 2rem;">
-        <h1 style="color: var(--accent-amber);">⚖️ Aucun Joueur Éliminé</h1>
-        <p class="subtitle" id="tie-desc" style="font-size: 1.15rem; margin: 1.5rem 0;">Égalité parfaite ou majorité de votes blancs.</p>
-        <button class="btn-primary" onclick="startNewSpeechRound()" style="max-width: 300px; margin: 0 auto;">Lancer un nouveau tour de parole</button>
-      </div>
-    </div>
-
-    <!-- 8. ÉLIMINATION (Rôle révélé, mot caché) -->
-    <div class="screen-container hidden" id="eliminated-screen">
-      <div class="panel" style="text-align: center; padding: 3rem 2rem;">
-        <h1 id="elim-title">Élimination</h1>
-        <div id="elim-role-box" style="margin: 1.5rem 0;"></div>
-        <p class="subtitle" style="font-size: 0.95rem; color: var(--text-muted);">Son mot secret reste secret jusqu'à la fin de la manche.</p>
-        <button class="btn-primary" onclick="continueAfterElimination()" style="max-width: 300px; margin: 0 auto;">Continuer la partie →</button>
-      </div>
-    </div>
-
-    <!-- 9. MR. WHITE GUESS -->
-    <div class="screen-container hidden" id="white-guess-screen">
-      <div class="panel" style="text-align: center; padding: 3rem 2rem;">
-        <h1 style="color: var(--accent-pink);">Dernière Chance !</h1>
-        <p class="subtitle"><strong id="white-player-name"></strong> (Mr. White) a été éliminé mais peut voler la victoire (+10 pts) en devinant le mot des Civils :</p>
-        <div style="max-width: 400px; margin: 2rem auto;">
-          <input type="text" id="white-guess-input" placeholder="Tapez le mot civil ici..." style="font-size: 1.1rem; text-align: center;">
-          <button class="btn-primary" onclick="checkWhiteGuess()" style="width: 100%; margin-top: 1rem;">Valider la devinette</button>
+    <!-- 4. TOUR DE PAROLE (DÉBAT) -->
+    <div class="screen-container hidden" id="game-debate-screen">
+      <div class="panel">
+        <h1>Tour de Table</h1>
+        <p class="subtitle">Donnez un mot-indice à tour de rôle :</p>
+        <div id="speech-order-container"></div>
+        
+        <div id="host-vote-trigger" class="hidden" style="margin-top: 1.5rem;">
+          <button class="btn-primary" onclick="broadcastStartVote()">Ouvrir les Votes sur tous les téléphones →</button>
         </div>
       </div>
     </div>
 
-    <!-- 10. SCOREBOARD & RÉCAPITULATIF DE FIN -->
-    <div class="screen-container hidden" id="scoreboard-screen">
-      <h1 id="winner-title">Fin de Manche</h1>
-      <p class="subtitle" id="winner-desc"></p>
-      
-      <div class="panel" id="endgame-recap-panel">
-        <h2>🔍 Révélation des Mots & Rôles</h2>
-        <div class="recap-box" id="recap-box-content"></div>
+    <!-- 5. PHASE DE VOTE SUR CHAQUE SMARTPHONE -->
+    <div class="screen-container hidden" id="game-vote-screen">
+      <div class="panel">
+        <h1>Votez contre un suspect</h1>
+        <p class="subtitle">Choisissez qui vous souhaitez éliminer ce tour-ci :</p>
+        <div style="display: flex; flex-direction: column; gap: 8px;" id="vote-targets-list"></div>
+        <button class="btn-primary" id="confirm-vote-btn" onclick="submitMyVote()" disabled>Confirmer mon vote</button>
       </div>
+    </div>
 
-      <div class="panel" style="margin-top: 1.5rem;">
-        <h2>Classement Général</h2>
-        <table class="scoreboard-table">
-          <thead>
-            <tr><th>Joueur</th><th>Score</th></tr>
-          </thead>
-          <tbody id="score-table-body"></tbody>
-        </table>
+    <!-- 6. RÉSULTAT DU VOTE / ÉLIMINATION -->
+    <div class="screen-container hidden" id="game-result-screen">
+      <div class="panel" style="text-align: center;">
+        <h1 id="result-title">Résultat du vote</h1>
+        <p id="result-desc" class="subtitle" style="font-size: 1.2rem; margin: 1.5rem 0; color: #fff;"></p>
+        
+        <div id="host-next-round-btn" class="hidden">
+          <button class="btn-primary" onclick="hostNextAction()">Continuer la partie →</button>
+        </div>
       </div>
+    </div>
 
-      <div class="btn-group">
-        <button class="btn-primary" onclick="restartMatch()">Manche Suivante →</button>
-        <button class="btn-secondary" onclick="resetAllScores()">Remettre à 0</button>
+    <!-- 7. FIN DE PARTIE -->
+    <div class="screen-container hidden" id="game-over-screen">
+      <div class="panel" style="text-align: center;">
+        <h1 id="winner-banner">Fin de la manche</h1>
+        <p id="winner-details" class="subtitle" style="font-size: 1.1rem; color: #fff;"></p>
+
+        <div style="background: var(--input-bg); padding: 15px; border-radius: 14px; text-align: left; margin: 15px 0;" id="final-words-recap"></div>
+
+        <div id="host-restart-btn" class="hidden">
+          <button class="btn-primary" onclick="hostRestartGame()">Rejouer une manche</button>
+        </div>
       </div>
     </div>
   </main>
 
   <script>
-    // Grand catalogue de mots
-    const allWordPairs = [
-      // Pop Culture, Réseaux & Streaming
+    // Catalogue de mots
+    const wordPool = [
       { w1: "TikTok", w2: "Instagram" },
       { w1: "Netflix", w2: "Prime Video" },
       { w1: "Spotify", w2: "Apple Music" },
       { w1: "Uber Eats", w2: "Deliveroo" },
-      { w1: "Tinder", w2: "Hinge" },
-      { w1: "BeReal", w2: "Story" },
-      { w1: "ChatGPT", w2: "Google" },
-      { w1: "AirPods", w2: "Casque Marshall" },
-      { w1: "Twitch", w2: "Kick" },
-      { w1: "Discord", w2: "Slack" },
-      
-      // Rap, Animes & Gaming
-      { w1: "One Piece", w2: "Naruto" },
-      { w1: "Demon Slayer", w2: "Jujutsu Kaisen" },
-      { w1: "L'Attaque des Titans", w2: "Death Note" },
-      { w1: "Fortnite", w2: "Valorant" },
-      { w1: "League of Legends", w2: "TFT" },
-      { w1: "Mario Kart", w2: "Smash Bros" },
-      { w1: "GTA", w2: "Cyberpunk" },
-      { w1: "Jul", w2: "SCH" },
-      { w1: "Laylow", w2: "Damso" },
-      { w1: "PNL", w2: "DTF" },
-      { w1: "Gazo", w2: "Freeze Corleone" },
-      { w1: "Squeezie", w2: "Mcfly & Carlito" },
-      { w1: "Inoxtag", w2: "Michou" },
-
-      // Mode, Lifestyle & Quotidien
-      { w1: "Friperie", w2: "Vinted" },
-      { w1: "Stan Smith", w2: "Samba" },
-      { w1: "Dunk Low", w2: "Air Force 1" },
-      { w1: "Crocs", w2: "Birkenstock" },
-      { w1: "Bubble Tea", w2: "Matcha Latte" },
       { w1: "Tacos", w2: "Kebab" },
+      { w1: "Fortnite", w2: "Valorant" },
+      { w1: "AirPods", w2: "Casque Marshall" },
+      { w1: "One Piece", w2: "Naruto" },
       { w1: "Pizza", w2: "Burger" },
       { w1: "Café", w2: "Thé" },
-      { w1: "Monster Energy", w2: "Red Bull" },
-      { w1: "Tequila", w2: "Jägermeister" },
-      { w1: "Salle de sport", w2: "Basic-Fit" },
-      { w1: "Before", w2: "After" },
-      { w1: "Airbnb", w2: "Auberge de jeunesse" },
-      { w1: "Colocation", w2: "Studio CROUS" },
-      { w1: "Red flag", w2: "Green flag" },
-
-      // Paires Classiques Undercover
       { w1: "Chien", w2: "Chat" },
-      { w1: "Lion", w2: "Tigre" },
-      { w1: "Soleil", w2: "Lune" },
-      { w1: "Avion", w2: "Hélicoptère" },
-      { w1: "Guitare", w2: "Violon" },
-      { w1: "Plage", w2: "Piscine" },
-      { w1: "Cinéma", w2: "Théâtre" },
-      { w1: "Lunettes", w2: "Lentilles" },
-      { w1: "Vélo", w2: "Trottinette" },
-      { w1: "Voiture", w2: "Moto" },
-      { w1: "Pomme", w2: "Poire" },
-      { w1: "Fraise", w2: "Framboise" },
-      { w1: "Fourchette", w2: "Cuillère" },
-      { w1: "Bague", w2: "Bracelet" },
-      { w1: "Manteau", w2: "Veste" },
-      { w1: "Montre", w2: "Horloge" },
-      { w1: "Miroir", w2: "Vitre" },
-      { w1: "Lampe", w2: "Bougie" },
-      { w1: "Douche", w2: "Baignoire" },
-      { w1: "Savon", w2: "Gel douche" },
-      { w1: "Mer", w2: "Océan" },
-      { w1: "Forêt", w2: "Jungle" },
-      { w1: "Pluie", w2: "Neige" },
-      { w1: "Médecin", w2: "Infirmier" },
-      { w1: "Policier", w2: "Gendarme" },
-      { w1: "Professeur", w2: "Formateur" },
-      { w1: "Hôtel", w2: "Camping" },
-      { w1: "Gare", w2: "Aéroport" },
-      { w1: "Fauteuil", w2: "Canapé" },
-      { w1: "Oreiller", w2: "Coussin" },
-      { w1: "Porte", w2: "Fenêtre" }
+      { w1: "Soleil", w2: "Lune" }
     ];
 
-    // Pioche sans remise (Deck de cartes)
-    let availableWordsPool = [];
+    let peer = null;
+    let isHost = false;
+    let roomCode = "";
+    let myNickname = "";
+    let myId = "";
+    let hostConn = null;
+    let connections = []; // Pour l'hôte : liste des sockets joueurs
 
-    function pickRandomWordPair() {
-      // Si la pioche est vide ou non initialisée, on la recharge et on la mélange
-      if (!availableWordsPool || availableWordsPool.length === 0) {
-        availableWordsPool = [...allWordPairs].sort(() => Math.random() - 0.5);
-      }
+    // État du jeu (géré par l'hôte)
+    let gameState = {
+      players: [],
+      currentPair: null,
+      speechOrder: [],
+      votes: {},
+      eliminatedId: null,
+      aliveCount: 0
+    };
 
-      // On extrait la dernière paire du deck (garantie zéro doublon tant que le deck n'est pas vide)
-      const selected = availableWordsPool.pop();
-
-      // Tirage à pile ou face pour savoir quel mot sera Civil et quel mot sera Undercover
-      const invert = Math.random() < 0.5;
-      return {
-        civil: invert ? selected.w2 : selected.w1,
-        undercover: invert ? selected.w1 : selected.w2
-      };
-    }
-
-    let currentMode = "mystery";
-    let counts = { civils: 3, undercovers: 1, whites: 1 };
-    let currentPair = null;
-    let players = [];
-    let currentPlayerIndex = 0;
-    let eliminatedPlayer = null;
-    let totalPlayersCount = 0;
-
-    function setMode(mode) {
-      currentMode = mode;
-      ["mystery", "auto", "manual"].forEach(m => {
-        document.getElementById(`tab-${m}`).classList.toggle("active", m === mode);
-        document.getElementById(`mode-${m}-view`).classList.toggle("hidden", m !== mode);
-      });
-      if (mode === "auto") updateAutoPreview();
-      if (mode === "manual") updateManualTotal();
-    }
-
-    function toggleSecondarySettings() {
-      const mode = document.getElementById("secondary-roles-mode").value;
-      document.getElementById("manual-secondary-box").classList.toggle("hidden", mode !== "manual");
-    }
-
-    function generateMysteryRoles(total) {
-      let maxImpostors = Math.floor((total - 1) / 2);
-      let totalImpostors = Math.floor(Math.random() * maxImpostors) + 1;
-      let undercovers = 0, whites = 0;
-      for (let i = 0; i < totalImpostors; i++) {
-        if (Math.random() < 0.6) undercovers++;
-        else whites++;
-      }
-      if (undercovers === 0 && whites === 0) undercovers = 1;
-      let civils = total - undercovers - whites;
-      return { civils, undercovers, whites };
-    }
-
-    function calculateAutoRoles(total) {
-      if (total <= 3) return { civils: 2, undercovers: 1, whites: 0 };
-      if (total === 4) return { civils: 3, undercovers: 1, whites: 0 };
-      if (total === 5) return { civils: 3, undercovers: 1, whites: 1 };
-      if (total === 6) return { civils: 4, undercovers: 1, whites: 1 };
-      if (total <= 8) return { civils: total - 3, undercovers: 2, whites: 1 };
-      const whites = Math.random() > 0.4 ? 1 : 2;
-      const undercovers = Math.max(2, Math.floor(total * 0.25));
-      const civils = total - undercovers - whites;
-      return { civils, undercovers, whites };
-    }
-
-    function updateAutoPreview() {
-      const total = parseInt(document.getElementById("total-auto-players").value) || 5;
-      const preview = calculateAutoRoles(total);
-      document.getElementById("auto-preview-badge").innerText = 
-        `Civils : ${preview.civils} | Undercover : ${preview.undercovers} | Mr. White : ${preview.whites}`;
-    }
-
-    function updateManualTotal() {
-      const c = parseInt(document.getElementById("nb-civils").value) || 0;
-      const u = parseInt(document.getElementById("nb-undercovers").value) || 0;
-      const w = parseInt(document.getElementById("nb-whites").value) || 0;
-      document.getElementById("manual-total-badge").innerText = `Total : ${c + u + w} joueur(s)`;
-    }
+    let selectedVoteId = null;
 
     function hideAllScreens() {
-      const screens = [
-        "setup-screen", "names-screen", "pass-screen", "reveal-screen", 
-        "debate-screen", "vote-screen", "tie-screen", "eliminated-screen", 
-        "white-guess-screen", "scoreboard-screen"
-      ];
-      screens.forEach(id => document.getElementById(id).classList.add("hidden"));
+      ["lobby-menu", "room-lobby", "game-role-screen", "game-debate-screen", "game-vote-screen", "game-result-screen", "game-over-screen"]
+        .forEach(id => document.getElementById(id).classList.add("hidden"));
     }
 
-    function getScores() {
-      return JSON.parse(localStorage.getItem("undercover_scores")) || {};
+    // --- 1. INITIALISATION HÔTE ---
+    function initHost() {
+      myNickname = document.getElementById("player-nickname").value.trim();
+      if (!myNickname) { alert("Veuillez entrer un prénom !"); return; }
+
+      roomCode = Math.random().toString(36).substring(2, 6).toUpperCase();
+      peer = new Peer("uc-" + roomCode);
+
+      peer.on("open", (id) => {
+        isHost = true;
+        myId = id;
+        gameState.players = [{ id: myId, name: myNickname, alive: true, role: "", word: "" }];
+        
+        document.getElementById("display-room-code").innerText = roomCode;
+        document.getElementById("host-controls").classList.remove("hidden");
+        document.getElementById("client-wait-msg").classList.add("hidden");
+
+        hideAllScreens();
+        document.getElementById("room-lobby").classList.remove("hidden");
+        updateLobbyUI();
+      });
+
+      peer.on("connection", (conn) => {
+        connections.push(conn);
+        conn.on("data", (data) => handleHostIncomingData(conn, data));
+        conn.on("close", () => {
+          gameState.players = gameState.players.filter(p => p.id !== conn.peer);
+          connections = connections.filter(c => c !== conn);
+          broadcast({ type: "LOBBY_UPDATE", players: gameState.players });
+          updateLobbyUI();
+        });
+      });
+
+      peer.on("error", () => {
+        alert("Erreur de connexion. Veuillez réessayer.");
+      });
     }
 
-    function saveScores(scores) {
-      localStorage.setItem("undercover_scores", JSON.stringify(scores));
+    // --- 2. REJOINDRE UNE SALLE (CLIENT) ---
+    function joinRoom() {
+      myNickname = document.getElementById("player-nickname").value.trim();
+      const code = document.getElementById("join-room-code").value.trim().toUpperCase();
+
+      if (!myNickname || !code) { alert("Entrez votre prénom et le code !"); return; }
+
+      peer = new Peer();
+      peer.on("open", (id) => {
+        myId = id;
+        isHost = false;
+        hostConn = peer.connect("uc-" + code);
+
+        hostConn.on("open", () => {
+          hostConn.send({ type: "JOIN", name: myNickname });
+          document.getElementById("display-room-code").innerText = code;
+          document.getElementById("host-controls").classList.add("hidden");
+          document.getElementById("client-wait-msg").classList.remove("hidden");
+          hideAllScreens();
+          document.getElementById("room-lobby").classList.remove("hidden");
+        });
+
+        hostConn.on("data", handleClientIncomingData);
+      });
     }
 
-    function addPoints(playerName, points) {
-      const scores = getScores();
-      scores[playerName] = (scores[playerName] || 0) + points;
-      saveScores(scores);
-    }
-
-    function goToNamesScreen() {
-      if (currentMode === "mystery") {
-        totalPlayersCount = parseInt(document.getElementById("total-mystery-players").value) || 5;
-        counts = generateMysteryRoles(totalPlayersCount);
-      } else if (currentMode === "auto") {
-        totalPlayersCount = parseInt(document.getElementById("total-auto-players").value) || 5;
-        counts = calculateAutoRoles(totalPlayersCount);
-      } else {
-        counts.civils = parseInt(document.getElementById("nb-civils").value) || 0;
-        counts.undercovers = parseInt(document.getElementById("nb-undercovers").value) || 0;
-        counts.whites = parseInt(document.getElementById("nb-whites").value) || 0;
-        totalPlayersCount = counts.civils + counts.undercovers + counts.whites;
+    // --- 3. GESTION DES MESSAGES HÔTE ---
+    function handleHostIncomingData(conn, data) {
+      if (data.type === "JOIN") {
+        gameState.players.push({ id: conn.peer, name: data.name, alive: true, role: "", word: "" });
+        broadcast({ type: "LOBBY_UPDATE", players: gameState.players });
+        updateLobbyUI();
+      } else if (data.type === "SUBMIT_VOTE") {
+        gameState.votes[conn.peer] = data.targetId;
+        checkAllVotesReceived();
       }
+    }
 
-      if (totalPlayersCount < 3) {
-        alert("Il faut au minimum 3 joueurs au total.");
+    function broadcast(data) {
+      connections.forEach(c => c.send(data));
+    }
+
+    function sendTo(peerId, data) {
+      const conn = connections.find(c => c.peer === peerId);
+      if (conn) conn.send(data);
+    }
+
+    function updateLobbyUI() {
+      document.getElementById("player-count").innerText = gameState.players.length;
+      const list = document.getElementById("lobby-players-list");
+      list.innerHTML = "";
+      gameState.players.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "player-card";
+        div.innerHTML = `<span class="avatar-dot"></span><span>${p.name}</span>`;
+        list.appendChild(div);
+      });
+    }
+
+    // --- 4. DISTRIBUTION DES RÔLES & DÉPART ---
+    function startOnlineGame() {
+      if (gameState.players.length < 3) {
+        alert("Il faut au moins 3 joueurs !");
         return;
       }
 
-      const savedNames = JSON.parse(localStorage.getItem("undercover_players")) || [];
-      const container = document.getElementById("names-container");
-      container.innerHTML = "";
+      // Choix du mot
+      const pairRaw = wordPool[Math.floor(Math.random() * wordPool.length)];
+      const invert = Math.random() < 0.5;
+      gameState.currentPair = {
+        civil: invert ? pairRaw.w2 : pairRaw.w1,
+        undercover: invert ? pairRaw.w1 : pairRaw.w2
+      };
 
-      for (let i = 1; i <= totalPlayersCount; i++) {
-        const div = document.createElement("div");
-        div.className = "input-row";
-        div.style.flexDirection = "column";
-        div.style.alignItems = "flex-start";
-        div.style.gap = "6px";
-        div.innerHTML = `
-          <label style="font-size:0.85rem; color:var(--text-muted);">Joueur ${i}</label>
-          <input type="text" id="player-name-input-${i}" placeholder="Prénom..." value="${savedNames[i - 1] || ''}">
-        `;
-        container.appendChild(div);
-      }
+      // Attribution des rôles (1 Undercover, le reste Civil)
+      let deck = ["undercover"];
+      for (let i = 0; i < gameState.players.length - 1; i++) deck.push("civil");
+      deck.sort(() => Math.random() - 0.5);
 
-      hideAllScreens();
-      document.getElementById("names-screen").classList.remove("hidden");
-    }
+      gameState.players.forEach((p, idx) => {
+        p.alive = true;
+        p.role = deck[idx];
+        p.word = p.role === "civil" ? gameState.currentPair.civil : gameState.currentPair.undercover;
 
-    function startGame() {
-      const enteredNames = [];
-      for (let i = 1; i <= totalPlayersCount; i++) {
-        const val = document.getElementById(`player-name-input-${i}`).value.trim();
-        enteredNames.push(val !== "" ? val : `Joueur ${i}`);
-      }
-
-      localStorage.setItem("undercover_players", JSON.stringify(enteredNames));
-
-      const currentScores = getScores();
-      enteredNames.forEach(name => {
-        if (currentScores[name] === undefined) currentScores[name] = 0;
-      });
-      saveScores(currentScores);
-
-      // Tirage avec anti-doublon et inversion aléatoire
-      currentPair = pickRandomWordPair();
-
-      let roleDeck = [];
-      for (let i = 0; i < counts.civils; i++) roleDeck.push({ type: "civil", word: currentPair.civil });
-      for (let i = 0; i < counts.undercovers; i++) roleDeck.push({ type: "undercover", word: currentPair.undercover });
-      for (let i = 0; i < counts.whites; i++) roleDeck.push({ type: "white", word: null });
-      roleDeck.sort(() => Math.random() - 0.5);
-
-      const secMode = document.getElementById("secondary-roles-mode").value;
-      let powersDeck = new Array(totalPlayersCount).fill(null);
-
-      if (secMode === "manual") {
-        let chosen = [];
-        if (document.getElementById("role-mayor").checked) chosen.push("mayor");
-        if (document.getElementById("role-shield").checked) chosen.push("shield");
-        if (document.getElementById("role-mute").checked) chosen.push("mute");
-        chosen.forEach((p, idx) => { if (idx < powersDeck.length) powersDeck[idx] = p; });
-        powersDeck.sort(() => Math.random() - 0.5);
-      } else if (secMode === "mystery") {
-        const possible = ["mayor", "shield", "mute"];
-        powersDeck = powersDeck.map(() => (Math.random() < 0.35 ? possible[Math.floor(Math.random() * possible.length)] : null));
-      }
-
-      players = enteredNames.map((name, index) => ({
-        id: index,
-        name: name,
-        type: roleDeck[index].type,
-        word: roleDeck[index].word,
-        power: powersDeck[index],
-        hasShield: powersDeck[index] === "shield",
-        alive: true
-      }));
-
-      currentPlayerIndex = 0;
-      showPassScreen();
-    }
-
-    function showPassScreen() {
-      hideAllScreens();
-      const current = players[currentPlayerIndex];
-      document.getElementById("player-target-name").innerText = current.name;
-      document.getElementById("pass-screen").classList.remove("hidden");
-    }
-
-    function showRole() {
-      hideAllScreens();
-      const current = players[currentPlayerIndex];
-      const wordDisplay = document.getElementById("word-display");
-      const headerDisplay = document.getElementById("reveal-header");
-      const hintDisplay = document.getElementById("role-hint");
-      const powerDisplay = document.getElementById("power-display");
-      const boxWrapper = document.getElementById("reveal-card-box");
-
-      boxWrapper.classList.toggle("white-role", current.type === "white");
-
-      if (current.type === "white") {
-        headerDisplay.innerText = `${current.name}, tu es :`;
-        wordDisplay.innerText = "Mr. White";
-        hintDisplay.innerText = "Tu n'as aucun mot ! Écoute bien et bluffe.";
-      } else {
-        headerDisplay.innerText = `${current.name}, ton mot secret :`;
-        wordDisplay.innerText = current.word;
-        hintDisplay.innerText = "Mémorise-le bien et reste discret !";
-      }
-
-      powerDisplay.innerHTML = "";
-      if (current.power === "mayor") {
-        powerDisplay.innerHTML = `<div class="power-tag">👑 Rôle Spécial : Le Maire (Vote compte double)</div>`;
-      } else if (current.power === "shield") {
-        powerDisplay.innerHTML = `<div class="power-tag">🛡️ Rôle Spécial : Le Bouclier (Survit à 1 élimination)</div>`;
-      } else if (current.power === "mute") {
-        powerDisplay.innerHTML = `<div class="power-tag">🤐 Rôle Spécial : Le Muet (Mime uniquement)</div>`;
-      }
-
-      document.getElementById("reveal-screen").classList.remove("hidden");
-    }
-
-    function nextPlayer() {
-      currentPlayerIndex++;
-      if (currentPlayerIndex < players.length) {
-        showPassScreen();
-      } else {
-        startNewSpeechRound();
-      }
-    }
-
-    function startNewSpeechRound() {
-      hideAllScreens();
-      const alive = players.filter(p => p.alive);
-      
-      let speechOrder = [...alive].sort(() => Math.random() - 0.5);
-
-      // Empêcher Mr. White de commencer en premier
-      if (speechOrder[0].type === "white") {
-        const nonWhiteIndex = speechOrder.findIndex(p => p.type !== "white");
-        if (nonWhiteIndex !== -1) {
-          [speechOrder[0], speechOrder[nonWhiteIndex]] = [speechOrder[nonWhiteIndex], speechOrder[0]];
+        if (p.id === myId) {
+          showMyRoleUI(p.role, p.word);
+        } else {
+          sendTo(p.id, { type: "YOUR_ROLE", role: p.role, word: p.word });
         }
-      }
+      });
 
-      const container = document.getElementById("speech-order-list");
+      if (isHost) {
+        document.getElementById("host-start-debate-btn").classList.remove("hidden");
+        document.getElementById("client-role-wait").classList.add("hidden");
+      }
+    }
+
+    function showMyRoleUI(role, word) {
+      hideAllScreens();
+      const cardBox = document.getElementById("role-card-box");
+      const wordDisplay = document.getElementById("my-secret-word");
+      const hint = document.getElementById("my-role-hint");
+
+      cardBox.classList.toggle("white-role", role === "white");
+      wordDisplay.innerText = word;
+      hint.innerText = "Mémorisez-le bien et gardez votre écran secret !";
+
+      document.getElementById("game-role-screen").classList.remove("hidden");
+    }
+
+    // --- 5. TOUR DE PAROLE (DÉBAT) ---
+    function broadcastStartDebate() {
+      const alive = gameState.players.filter(p => p.alive);
+      gameState.speechOrder = [...alive].sort(() => Math.random() - 0.5);
+
+      const payload = { type: "START_DEBATE", order: gameState.speechOrder };
+      broadcast(payload);
+      handleClientIncomingData(payload);
+    }
+
+    function renderDebateScreen(order) {
+      hideAllScreens();
+      const container = document.getElementById("speech-order-container");
       container.innerHTML = "";
 
-      speechOrder.forEach((player, idx) => {
+      order.forEach((p, idx) => {
         const div = document.createElement("div");
         div.className = "order-card";
         div.innerHTML = `
-          <div class="order-badge">${idx + 1}</div>
-          <div>
-            <div style="font-weight: 700; font-size: 1.05rem;">${player.name}</div>
-            ${idx === 0 ? '<span style="color:var(--accent-green); font-size:0.8rem; font-weight:700;">★ Ouvre le tour</span>' : ''}
-            ${player.power === 'mute' ? '<span style="color:var(--accent-pink); font-size:0.8rem; margin-left:6px;">🤐 Muet</span>' : ''}
-          </div>
+          <div class="order-num">${idx + 1}</div>
+          <div style="font-weight:700;">${p.name} ${idx === 0 ? '<span style="color:var(--accent-green); font-size:0.8rem; margin-left:6px;">★ Commence</span>' : ''}</div>
         `;
         container.appendChild(div);
       });
 
-      document.getElementById("debate-screen").classList.remove("hidden");
+      if (isHost) document.getElementById("host-vote-trigger").classList.remove("hidden");
+      document.getElementById("game-debate-screen").classList.remove("hidden");
     }
 
-    function openVotePhase() {
+    // --- 6. PHASE DE VOTE EN TEMPS RÉEL ---
+    function broadcastStartVote() {
+      gameState.votes = {};
+      const alive = gameState.players.filter(p => p.alive);
+      const payload = { type: "START_VOTE", alivePlayers: alive };
+      broadcast(payload);
+      handleClientIncomingData(payload);
+    }
+
+    function renderVoteScreen(alivePlayers) {
       hideAllScreens();
-      const alive = players.filter(p => p.alive);
-      const container = document.getElementById("vote-inputs-container");
-      container.innerHTML = "";
+      selectedVoteId = null;
+      document.getElementById("confirm-vote-btn").disabled = true;
+      const list = document.getElementById("vote-targets-list");
+      list.innerHTML = "";
 
-      alive.forEach(voter => {
-        const card = document.createElement("div");
-        card.className = "vote-card";
-        
-        let options = `<option value="-1">⚪ Vote blanc / Passer</option>`;
-        alive.forEach(suspect => {
-          if (suspect.id !== voter.id) {
-            options += `<option value="${suspect.id}">❌ Accuser ${suspect.name}</option>`;
-          }
-        });
-
-        card.innerHTML = `
-          <span>${voter.name} ${voter.power === 'mayor' ? '👑' : ''}</span>
-          <select id="vote-from-${voter.id}">${options}</select>
-        `;
-        container.appendChild(card);
-      });
-
-      document.getElementById("vote-screen").classList.remove("hidden");
-    }
-
-    function processVotes() {
-      const alive = players.filter(p => p.alive);
-      let tally = {};
-      alive.forEach(p => tally[p.id] = 0);
-      let blankVotes = 0;
-
-      alive.forEach(voter => {
-        const targetId = parseInt(document.getElementById(`vote-from-${voter.id}`).value);
-        const weight = voter.power === "mayor" ? 2 : 1;
-        
-        if (targetId === -1) {
-          blankVotes += weight;
-        } else {
-          tally[targetId] = (tally[targetId] || 0) + weight;
+      alivePlayers.forEach(p => {
+        if (p.id !== myId) {
+          const btn = document.createElement("button");
+          btn.className = "vote-btn-player";
+          btn.innerText = `Accuser ${p.name}`;
+          btn.onclick = () => {
+            document.querySelectorAll(".vote-btn-player").forEach(b => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            selectedVoteId = p.id;
+            document.getElementById("confirm-vote-btn").disabled = false;
+          };
+          list.appendChild(btn);
         }
       });
 
-      let maxVotes = 0;
-      let topSuspects = [];
-
-      for (const [id, count] of Object.entries(tally)) {
-        if (count > maxVotes) {
-          maxVotes = count;
-          topSuspects = [parseInt(id)];
-        } else if (count === maxVotes && maxVotes > 0) {
-          topSuspects.push(parseInt(id));
-        }
-      }
-
-      if (maxVotes === 0 || blankVotes >= maxVotes || topSuspects.length > 1) {
-        hideAllScreens();
-        if (topSuspects.length > 1) {
-          const names = topSuspects.map(id => players.find(p => p.id === id).name).join(" et ");
-          document.getElementById("tie-desc").innerText = `Égalité parfaite entre ${names} (${maxVotes} voix chacun). Personne n'est éliminé !`;
-        } else {
-          document.getElementById("tie-desc").innerText = `Majorité de votes blancs. Aucun suspect n'est éliminé ce tour-ci.`;
-        }
-        document.getElementById("tie-screen").classList.remove("hidden");
-        return;
-      }
-
-      const eliminated = players.find(p => p.id === topSuspects[0]);
-      handleElimination(eliminated);
+      document.getElementById("game-vote-screen").classList.remove("hidden");
     }
 
-    function handleElimination(player) {
-      if (player.hasShield) {
-        player.hasShield = false;
-        alert(`🛡️ ${player.name} possédait le Bouclier ! L'élimination a été bloquée. Il reste en jeu !`);
-        startNewSpeechRound();
-        return;
-      }
-
-      player.alive = false;
-      eliminatedPlayer = player;
-
-      hideAllScreens();
-      document.getElementById("elim-title").innerText = `${player.name} a été éliminé(e) !`;
-
-      const roleBox = document.getElementById("elim-role-box");
-      let roleHtml = "";
-
-      if (player.type === "civil") {
-        roleHtml = `<div class="role-badge-revealed" style="background: rgba(16, 185, 129, 0.2); color: var(--accent-green); border: 1px solid var(--accent-green);">🧑‍🌾 C'était un Civil !</div>`;
-      } else if (player.type === "undercover") {
-        roleHtml = `<div class="role-badge-revealed" style="background: rgba(244, 63, 94, 0.2); color: var(--accent-pink); border: 1px solid var(--accent-pink);">🕵️ C'était un Undercover !</div>`;
-      } else if (player.type === "white") {
-        roleHtml = `<div class="role-badge-revealed" style="background: rgba(244, 63, 94, 0.2); color: var(--accent-pink); border: 1px solid var(--accent-pink);">🎭 C'était Mr. White !</div>`;
-      }
-
-      if (player.power) {
-        const map = { mayor: "👑 Le Maire", shield: "🛡️ Le Bouclier", mute: "🤐 Le Muet" };
-        roleHtml += `<div class="power-tag" style="margin-top: 8px;">Pouvoir : ${map[player.power]}</div>`;
-      }
-
-      roleBox.innerHTML = roleHtml;
-      document.getElementById("eliminated-screen").classList.remove("hidden");
-    }
-
-    function continueAfterElimination() {
-      if (eliminatedPlayer.type === "white") {
-        hideAllScreens();
-        document.getElementById("white-player-name").innerText = eliminatedPlayer.name;
-        document.getElementById("white-guess-input").value = "";
-        document.getElementById("white-guess-screen").classList.remove("hidden");
-        return;
-      }
-      checkGameState();
-    }
-
-    function checkWhiteGuess() {
-      const guess = document.getElementById("white-guess-input").value.trim().toLowerCase();
-      const actualWord = currentPair.civil.toLowerCase();
-
-      if (guess === actualWord) {
-        addPoints(eliminatedPlayer.name, 10);
-        showScoreboard(false, `${eliminatedPlayer.name} vole la victoire !`, `Devinette réussie ("${currentPair.civil}"). +10 points !`);
+    function submitMyVote() {
+      if (isHost) {
+        gameState.votes[myId] = selectedVoteId;
+        checkAllVotesReceived();
       } else {
-        alert(`Mauvaise devinette ! ${eliminatedPlayer.name} quitte définitivement la partie.`);
-        checkGameState();
+        hostConn.send({ type: "SUBMIT_VOTE", targetId: selectedVoteId });
+      }
+      document.getElementById("confirm-vote-btn").innerText = "Vote envoyé ! En attente...";
+      document.getElementById("confirm-vote-btn").disabled = true;
+    }
+
+    function checkAllVotesReceived() {
+      const alive = gameState.players.filter(p => p.alive);
+      if (Object.keys(gameState.votes).length >= alive.length) {
+        // Dépouillement
+        let tally = {};
+        alive.forEach(p => tally[p.id] = 0);
+        Object.values(gameState.votes).forEach(targetId => tally[targetId] = (tally[targetId] || 0) + 1);
+
+        let max = 0;
+        let top = [];
+        for (const [id, count] of Object.entries(tally)) {
+          if (count > max) { max = count; top = [id]; }
+          else if (count === max) { top.push(id); }
+        }
+
+        if (top.length > 1) {
+          // Égalité
+          const payload = { type: "VOTE_RESULT", tie: true };
+          broadcast(payload);
+          handleClientIncomingData(payload);
+        } else {
+          const elim = gameState.players.find(p => p.id === top[0]);
+          elim.alive = false;
+          const payload = { type: "VOTE_RESULT", tie: false, eliminated: elim };
+          broadcast(payload);
+          handleClientIncomingData(payload);
+        }
       }
     }
 
-    function checkGameState() {
-      const alivePlayers = players.filter(p => p.alive);
-      const civilsAlive = alivePlayers.filter(p => p.type === 'civil').length;
-      const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
+    // --- 7. RÉCEPTION MESSAGES SUR CHAQUE CLIENT ---
+    function handleClientIncomingData(data) {
+      if (data.type === "LOBBY_UPDATE") {
+        gameState.players = data.players;
+        updateLobbyUI();
+      } else if (data.type === "YOUR_ROLE") {
+        showMyRoleUI(data.role, data.word);
+      } else if (data.type === "START_DEBATE") {
+        renderDebateScreen(data.order);
+      } else if (data.type === "START_VOTE") {
+        renderVoteScreen(data.alivePlayers);
+      } else if (data.type === "VOTE_RESULT") {
+        hideAllScreens();
+        const desc = document.getElementById("result-desc");
+        if (data.tie) {
+          desc.innerText = "Égalité parfaite ! Aucun joueur n'est éliminé ce tour-ci.";
+        } else {
+          desc.innerText = `${data.eliminated.name} a été éliminé(e) ! C'était un ${data.eliminated.role === 'civil' ? 'Civil 🧑‍🌾' : 'Undercover 🕵️'}.`;
+        }
 
-      if (impostorsAlive === 0) {
-        players.forEach(p => {
-          if (p.type === "civil") addPoints(p.name, p.alive ? 2 : 1);
-        });
-        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs ont été démasqués (+2 pts aux survivants).`);
-        return;
-      }
-
-      if (impostorsAlive > civilsAlive || civilsAlive <= 1) {
-        players.forEach(p => {
-          if (p.type === "undercover") addPoints(p.name, p.alive ? 6 : 3);
-          if (p.type === "white" && p.alive) addPoints(p.name, 6);
-        });
-        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs remportent la manche (+6 pts).`);
-        return;
-      }
-
-      startNewSpeechRound();
-    }
-
-    function showScoreboard(fromMenu = false, title = "Tableau des Scores", desc = "") {
-      hideAllScreens();
-      document.getElementById("winner-title").innerText = title;
-      document.getElementById("winner-desc").innerText = desc;
-
-      const recapPanel = document.getElementById("endgame-recap-panel");
-      const recapBox = document.getElementById("recap-box-content");
-
-      if (fromMenu || !currentPair) {
-        recapPanel.classList.add("hidden");
-      } else {
-        recapPanel.classList.remove("hidden");
-        
-        let html = `
-          <div style="margin-bottom: 12px; font-size: 1.05rem;">
-            <div>🧑‍🌾 <strong>Mot des Civils :</strong> <span style="color:var(--accent-green); font-weight:800;">${currentPair.civil}</span></div>
-            <div style="margin-top:4px;">🕵️ <strong>Mot des Undercovers :</strong> <span style="color:var(--accent-pink); font-weight:800;">${currentPair.undercover}</span></div>
-          </div>
-          <hr style="border:0; border-top:1px solid var(--border); margin:12px 0;">
+        if (isHost) document.getElementById("host-next-round-btn").classList.remove("hidden");
+        document.getElementById("game-result-screen").classList.remove("hidden");
+      } else if (data.type === "GAME_OVER") {
+        hideAllScreens();
+        document.getElementById("winner-banner").innerText = data.title;
+        document.getElementById("winner-details").innerText = data.desc;
+        document.getElementById("final-words-recap").innerHTML = `
+          <div>🧑‍🌾 Mot Civil : <strong style="color:var(--accent-green)">${data.pair.civil}</strong></div>
+          <div style="margin-top:6px;">🕵️ Mot Undercover : <strong style="color:var(--accent-pink)">${data.pair.undercover}</strong></div>
         `;
-
-        players.forEach(p => {
-          let roleName = p.type === 'civil' ? 'Civil' : (p.type === 'undercover' ? 'Undercover' : 'Mr. White');
-          let wordStr = p.type === 'white' ? 'Aucun mot' : `"${p.word}"`;
-          let powerStr = p.power ? ` | ⚡ ${p.power}` : '';
-
-          html += `
-            <div class="recap-item">
-              <div>
-                <strong>${p.name}</strong> 
-                <span style="font-size:0.85rem; color:var(--text-muted);">(${p.alive ? 'En vie' : 'Éliminé'})</span>
-              </div>
-              <div style="text-align:right;">
-                <span style="color:#818cf8; font-weight:700;">${roleName}</span> : <em>${wordStr}</em>${powerStr}
-              </div>
-            </div>
-          `;
-        });
-
-        recapBox.innerHTML = html;
-      }
-
-      const scores = getScores();
-      const tbody = document.getElementById("score-table-body");
-      tbody.innerHTML = "";
-
-      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-      sorted.forEach(([name, score]) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td><strong>${name}</strong></td><td>${score} pts</td>`;
-        tbody.appendChild(row);
-      });
-
-      document.getElementById("scoreboard-screen").classList.remove("hidden");
-    }
-
-    function restartMatch() {
-      hideAllScreens();
-      document.getElementById("setup-screen").classList.remove("hidden");
-    }
-
-    function resetAllScores() {
-      if (confirm("Remettre les scores de tous les joueurs à zéro ?")) {
-        localStorage.removeItem("undercover_scores");
-        showScoreboard(true, "Scores réinitialisés", "Tous les compteurs sont à 0.");
+        if (isHost) document.getElementById("host-restart-btn").classList.remove("hidden");
+        document.getElementById("game-over-screen").classList.remove("hidden");
       }
     }
 
-    updateAutoPreview();
-    updateManualTotal();
+    function hostNextAction() {
+      const alive = gameState.players.filter(p => p.alive);
+      const civils = alive.filter(p => p.role === "civil").length;
+      const impostors = alive.filter(p => p.role !== "civil").length;
+
+      if (impostors === 0) {
+        const payload = { type: "GAME_OVER", title: "Victoire des Civils ! 🧑‍🌾", desc: "Tous les imposteurs ont été démasqués.", pair: gameState.currentPair };
+        broadcast(payload);
+        handleClientIncomingData(payload);
+      } else if (impostors >= civils) {
+        const payload = { type: "GAME_OVER", title: "Victoire des Undercovers ! 🕵️", desc: "Les imposteurs sont en supériorité numérique.", pair: gameState.currentPair };
+        broadcast(payload);
+        handleClientIncomingData(payload);
+      } else {
+        broadcastStartDebate();
+      }
+    }
+
+    function hostRestartGame() {
+      startOnlineGame();
+    }
   </script>
 </body>
 </html>
