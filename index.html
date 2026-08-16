@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Undercover - Jeu Complet</title>
+  <title>Undercover - Système de Points</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -41,14 +41,8 @@
       font-size: 1rem;
       box-sizing: border-box;
     }
-    input[type="number"] {
-      width: 70px;
-      text-align: center;
-    }
-    input[type="text"] {
-      width: 100%;
-      text-align: left;
-    }
+    input[type="number"] { width: 70px; text-align: center; }
+    input[type="text"] { width: 100%; text-align: left; }
     .name-inputs-list {
       display: flex;
       flex-direction: column;
@@ -72,15 +66,9 @@
       transition: background 0.2s;
     }
     button:hover { background: #b4befe; }
-    .btn-secondary {
-      background: #45475a;
-      color: #cdd6f4;
-    }
+    .btn-secondary { background: #45475a; color: #cdd6f4; }
     .btn-secondary:hover { background: #585b70; }
-    .btn-danger {
-      background: #f38ba8;
-      color: #11111b;
-    }
+    .btn-danger { background: #f38ba8; color: #11111b; }
     .btn-danger:hover { background: #eba0ac; }
     .hidden { display: none; }
     .secret-word {
@@ -90,41 +78,27 @@
       margin: 20px 0;
     }
     .white-role { color: #f38ba8; }
-    .vote-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin: 15px 0;
-    }
-    .vote-btn {
-      background: #45475a;
-      color: #cdd6f4;
-      margin-top: 0;
-    }
+    .vote-list { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
+    .vote-btn { background: #45475a; color: #cdd6f4; margin-top: 0; }
     .vote-btn:hover { background: #585b70; }
-    .alive-count {
-      font-size: 0.9rem;
-      color: #bac2de;
-      margin-bottom: 15px;
-    }
-    .pair-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    .alive-count { font-size: 0.9rem; color: #bac2de; margin-bottom: 15px; }
+    
+    /* Tableau des scores */
+    .score-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 15px 0;
       background: #181825;
-      padding: 8px 12px;
-      border-radius: 6px;
-      margin-bottom: 6px;
-      font-size: 0.95rem;
+      border-radius: 8px;
+      overflow: hidden;
     }
-    .pair-delete-btn {
-      width: auto;
-      margin: 0;
-      padding: 4px 8px;
-      background: #f38ba8;
-      color: #11111b;
-      font-size: 0.8rem;
+    .score-table th, .score-table td {
+      padding: 10px;
+      border-bottom: 1px solid #313244;
+      text-align: left;
     }
+    .score-table th { background: #11111b; color: #89b4fa; }
+    .score-table td:last-child { text-align: right; font-weight: bold; color: #f9e2af; }
   </style>
 </head>
 <body>
@@ -145,40 +119,27 @@
       <input type="number" id="nb-whites" value="1" min="0">
     </div>
     <button onclick="goToNamesScreen()">Suivant : Nommer les joueurs</button>
-    <button class="btn-secondary" onclick="showWordManagerScreen()">⚙️ Gérer les mots secrets</button>
+    <button class="btn-secondary" onclick="showScoreboard(true)">🏆 Tableau des Scores</button>
   </div>
 
-  <!-- 2. Gestion des mots secrets (LocalStorage) -->
-  <div class="card hidden" id="word-manager-screen">
-    <h2>Paires de mots</h2>
-    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-      <input type="text" id="new-civil-word" placeholder="Mot Civil">
-      <input type="text" id="new-under-word" placeholder="Mot Undercover">
-    </div>
-    <button onclick="addCustomWordPair()">+ Ajouter la paire</button>
-    <div class="name-inputs-list" id="custom-words-list"></div>
-    <button class="btn-secondary" onclick="restoreDefaultWords()">Restaurer les mots par défaut</button>
-    <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">Retour</button>
-  </div>
-
-  <!-- 3. Saisie des prénoms (LocalStorage) -->
+  <!-- 2. Saisie des prénoms -->
   <div class="card hidden" id="names-screen">
     <h2>Noms des Joueurs</h2>
-    <p style="font-size: 0.9rem; color: #a6adc8;">Entrez le nom de chaque participant :</p>
+    <p style="font-size: 0.9rem; color: #a6adc8;">Entrez le prénom de chaque participant :</p>
     <div class="name-inputs-list" id="names-container"></div>
-    <button onclick="startGame()">Lancer la distribution</button>
+    <button onclick="startGame()">Lancer la manche</button>
     <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">Retour</button>
   </div>
 
-  <!-- 4. Écran de passage du téléphone -->
+  <!-- 3. Passage du téléphone -->
   <div class="card hidden" id="pass-screen">
     <h2>À ton tour !</h2>
     <p>Donnez le téléphone à <strong id="player-target-name" style="color: #89b4fa;">---</strong>.</p>
-    <p style="font-size: 0.85rem; color: #a6adc8;">Regardez l'écran à l'abri des regards indiscrets.</p>
+    <p style="font-size: 0.85rem; color: #a6adc8;">Regardez l'écran à l'abri des regards.</p>
     <button onclick="showRole()">Voir mon mot</button>
   </div>
 
-  <!-- 5. Révélation secrète -->
+  <!-- 4. Révélation du mot -->
   <div class="card hidden" id="reveal-screen">
     <h2 id="reveal-header">Votre mot secret :</h2>
     <div class="secret-word" id="word-display">---</div>
@@ -186,109 +147,56 @@
     <button onclick="nextPlayer()">Cacher et passer</button>
   </div>
 
-  <!-- 6. Phase de Débat et Vote -->
+  <!-- 5. Vote -->
   <div class="card hidden" id="vote-screen">
     <h2>Phase de Vote</h2>
     <p class="alive-count" id="alive-status"></p>
-    <p>Après les indices oraux, désignez qui éliminer :</p>
+    <p>Après le tour de parole, choisissez qui éliminer :</p>
     <div class="vote-list" id="vote-buttons"></div>
   </div>
 
-  <!-- 7. Révélation de l'élimination -->
+  <!-- 6. Élimination -->
   <div class="card hidden" id="eliminated-screen">
     <h2 id="elim-title">Joueur éliminé</h2>
     <p id="elim-desc"></p>
     <button onclick="continueAfterElimination()">Continuer</button>
   </div>
 
-  <!-- 8. Dernière chance Mr. White -->
+  <!-- 7. Devinette Mr. White -->
   <div class="card hidden" id="white-guess-screen">
     <h2 class="white-role">Dernière chance Mr. White !</h2>
-    <p><strong id="white-player-name"></strong> a été découvert mais peut gagner s'il devine le mot exact des Civils :</p>
+    <p><strong id="white-player-name"></strong> peut voler la victoire (+10 pts) en trouvant le mot des Civils :</p>
     <input type="text" id="white-guess-input" placeholder="Tapez le mot secret des civils">
     <button onclick="checkWhiteGuess()">Valider la tentative</button>
   </div>
 
-  <!-- 9. Fin de partie -->
-  <div class="card hidden" id="gameover-screen">
-    <h2 id="winner-title">Fin de partie</h2>
+  <!-- 8. Fin de manche et Tableau des scores -->
+  <div class="card hidden" id="scoreboard-screen">
+    <h2 id="winner-title">Fin de Manche</h2>
     <p id="winner-desc"></p>
-    <button onclick="resetGame()">Nouvelle partie</button>
+    <table class="score-table">
+      <thead>
+        <tr><th>Joueur</th><th>Score Global</th></tr>
+      </thead>
+      <tbody id="score-table-body"></tbody>
+    </table>
+    <button onclick="restartMatch()">Manche Suivante</button>
+    <button class="btn-secondary" onclick="resetAllScores()">Remettre les scores à zéro</button>
   </div>
 
   <script>
-    const defaultWordPairs = [
-  { civil: "TikTok", undercover: "Instagram" },
-  { civil: "BeReal", undercover: "Story" },
-  { civil: "Netflix", undercover: "Prime Video" },
-  { civil: "Spotify", undercover: "Deezer" },
-  { civil: "Uber Eats", undercover: "Deliveroo" },
-  { civil: "Bubble Tea", undercover: "Matcha" },
-  { civil: "Tacos", undercover: "Kebab" },
-  { civil: "Friperie", undercover: "Vinted" },
-  { civil: "Tinder", undercover: "Hinge" },
-  { civil: "Red flag", undercover: "Green flag" },
-  { civil: "ChatGPT", undercover: "Gemini" },
-  { civil: "Écouteurs", undercover: "Casque" },
-  { civil: "Salle de sport", undercover: "Basic-Fit" },
-  { civil: "Cigarette électronique", undercover: "Cigarette" },
-  { civil: "Monster", undercover: "Red Bull" },
-  { civil: "Rocket League", undercover: "Valorant" },
-  { civil: "Mario Kart", undercover: "Smash Bros" },
-  { civil: "One Piece", undercover: "SNK" },
-  { civil: "Festival", undercover: "Soirée en appart" },
-  { civil: "Before", undercover: "After" },
-  { civil: "Airbnb", undercover: "Hotel" },
-  { civil: "Télétravail", undercover: "Présentiel" },
-  { civil: "Café", undercover: "Thé" },
-  { civil: "Chien", undercover: "Chat" },
-  { civil: "Lion", undercover: "Tigre" },
-  { civil: "Soleil", undercover: "Lune" },
-  { civil: "Avion", undercover: "Hélicoptère" },
-  { civil: "Guitare", undercover: "Violon" },
-  { civil: "Pizza", undercover: "Burger" },
-  { civil: "Plage", undercover: "Piscine" },
-  { civil: "Cinéma", undercover: "Théâtre" },
-  { civil: "Lunettes", undercover: "Lentilles" },
-  { civil: "Vélo", undercover: "Trottinette" },
-  { civil: "Voiture", undercover: "Moto" },
-  { civil: "Stylo", undercover: "Crayon" },
-  { civil: "Livre", undercover: "Journal" },
-  { civil: "Pomme", undercover: "Poire" },
-  { civil: "Fraise", undercover: "Framboise" },
-  { civil: "Chocolat chaud", undercover: "Cappuccino" },
-  { civil: "Beurre doux", undercover: "Beurre salé" },
-  { civil: "Sel", undercover: "Poivre" },
-  { civil: "Fourchette", undercover: "Cuillère" },
-  { civil: "Bague", undercover: "Bracelet" },
-  { civil: "Écharpe", undercover: "Foulard" },
-  { civil: "Chapeau", undercover: "Casquette" },
-  { civil: "Miroir", undercover: "Vitre" },
-  { civil: "Lampe", undercover: "Bougie" },
-  { civil: "Douche", undercover: "Baignoire" },
-  { civil: "Savon", undercover: "Gel douche" },
-  { civil: "Dentifrice", undercover: "Bain de bouche" },
-  { civil: "Mer", undercover: "Océan" },
-  { civil: "Lac", undercover: "Rivière" },
-  { civil: "Montagne", undercover: "Colline" },
-  { civil: "Forêt", undercover: "Jungle" },
-  { civil: "Pluie", undercover: "Neige" },
-  { civil: "Tempête", undercover: "Ouragan" },
-  { civil: "Médecin", undercover: "Infirmier" },
-  { civil: "Policier", undercover: "Gendarme" },
-  { civil: "Professeur", undercover: "Formateur" },
-  { civil: "Boulanger", undercover: "Pâtissier" },
-  { civil: "Hôtel", undercover: "Camping" },
-  { civil: "Taxi", undercover: "Bus" },
-  { civil: "Gare", undercover: "Aéroport" },
-  { civil: "Valise", undercover: "Sac à dos" },
-  { civil: "Téléphone", undercover: "Tablette" },
-  { civil: "Souris", undercover: "Clavier" },
-  { civil: "Fauteuil", undercover: "Canapé" },
-  { civil: "Oreiller", undercover: "Coussin" },
-  { civil: "Couverture", undercover: "Couette" },
-  { civil: "Porte", undercover: "Fenêtre" }
-];
+    const wordPairs = [
+      { civil: "TikTok", undercover: "Instagram" },
+      { civil: "Netflix", undercover: "Prime Video" },
+      { civil: "Spotify", undercover: "Apple Music" },
+      { civil: "Uber Eats", undercover: "Deliveroo" },
+      { civil: "Tacos", undercover: "Kebab" },
+      { civil: "Fortnite", undercover: "Valorant" },
+      { civil: "AirPods", undercover: "Casque Marshall" },
+      { civil: "Chien", undercover: "Chat" },
+      { civil: "Café", undercover: "Thé" },
+      { civil: "Soleil", undercover: "Lune" }
+    ];
 
     let currentPair = null;
     let players = [];
@@ -296,96 +204,36 @@
     let eliminatedPlayer = null;
     let totalPlayersCount = 0;
 
-    // Utilitaires de navigation
+    function getScores() {
+      return JSON.parse(localStorage.getItem("undercover_scores")) || {};
+    }
+
+    function saveScores(scores) {
+      localStorage.setItem("undercover_scores", JSON.stringify(scores));
+    }
+
+    function addPoints(playerName, points) {
+      const scores = getScores();
+      scores[playerName] = (scores[playerName] || 0) + points;
+      saveScores(scores);
+    }
+
     function hideAllScreens() {
       const screens = [
-        "setup-screen", "word-manager-screen", "names-screen", 
-        "pass-screen", "reveal-screen", "vote-screen", 
-        "eliminated-screen", "white-guess-screen", "gameover-screen"
+        "setup-screen", "names-screen", "pass-screen", "reveal-screen", 
+        "vote-screen", "eliminated-screen", "white-guess-screen", "scoreboard-screen"
       ];
       screens.forEach(id => document.getElementById(id).classList.add("hidden"));
     }
 
-    // Gestion du LocalStorage des Mots
-    function getWordPairs() {
-      const saved = localStorage.getItem("undercover_words");
-      return saved ? JSON.parse(saved) : defaultWordPairs;
-    }
-
-    function saveWordPairs(pairs) {
-      localStorage.setItem("undercover_words", JSON.stringify(pairs));
-    }
-
-    function showWordManagerScreen() {
-      hideAllScreens();
-      renderWordPairsList();
-      document.getElementById("word-manager-screen").classList.remove("hidden");
-    }
-
-    function renderWordPairsList() {
-      const listContainer = document.getElementById("custom-words-list");
-      const pairs = getWordPairs();
-      listContainer.innerHTML = "";
-
-      pairs.forEach((pair, index) => {
-        const item = document.createElement("div");
-        item.className = "pair-item";
-        item.innerHTML = `
-          <span><strong>${pair.civil}</strong> / ${pair.undercover}</span>
-          <button class="pair-delete-btn" onclick="deleteWordPair(${index})">✕</button>
-        `;
-        listContainer.appendChild(item);
-      });
-    }
-
-    function addCustomWordPair() {
-      const civilInput = document.getElementById("new-civil-word");
-      const underInput = document.getElementById("new-under-word");
-      const civil = civilInput.value.trim();
-      const undercover = underInput.value.trim();
-
-      if (!civil || !undercover) {
-        alert("Veuillez remplir les deux mots.");
-        return;
-      }
-
-      const pairs = getWordPairs();
-      pairs.push({ civil, undercover });
-      saveWordPairs(pairs);
-
-      civilInput.value = "";
-      underInput.value = "";
-      renderWordPairsList();
-    }
-
-    function deleteWordPair(index) {
-      const pairs = getWordPairs();
-      if (pairs.length <= 1) {
-        alert("Il doit rester au moins une paire de mots pour jouer.");
-        return;
-      }
-      pairs.splice(index, 1);
-      saveWordPairs(pairs);
-      renderWordPairsList();
-    }
-
-    function restoreDefaultWords() {
-      if (confirm("Réinitialiser toutes les paires de mots avec la liste par défaut ?")) {
-        saveWordPairs(defaultWordPairs);
-        renderWordPairsList();
-      }
-    }
-
-    // Gestion des Noms et Transition
     function goToNamesScreen() {
       const civilsCount = parseInt(document.getElementById("nb-civils").value) || 0;
       const undercoversCount = parseInt(document.getElementById("nb-undercovers").value) || 0;
       const whitesCount = parseInt(document.getElementById("nb-whites").value) || 0;
 
       totalPlayersCount = civilsCount + undercoversCount + whitesCount;
-
       if (totalPlayersCount < 3) {
-        alert("Il faut au minimum 3 joueurs au total pour lancer une partie.");
+        alert("Il faut au minimum 3 joueurs au total.");
         return;
       }
 
@@ -406,7 +254,6 @@
       document.getElementById("names-screen").classList.remove("hidden");
     }
 
-    // Lancement de la partie
     function startGame() {
       const civilsCount = parseInt(document.getElementById("nb-civils").value) || 0;
       const undercoversCount = parseInt(document.getElementById("nb-undercovers").value) || 0;
@@ -420,8 +267,14 @@
 
       localStorage.setItem("undercover_players", JSON.stringify(enteredNames));
 
-      const pairs = getWordPairs();
-      currentPair = pairs[Math.floor(Math.random() * pairs.length)];
+      // Initialiser le score pour les nouveaux joueurs s'ils n'existent pas
+      const currentScores = getScores();
+      enteredNames.forEach(name => {
+        if (currentScores[name] === undefined) currentScores[name] = 0;
+      });
+      saveScores(currentScores);
+
+      currentPair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
 
       let roleDeck = [];
       for (let i = 0; i < civilsCount; i++) roleDeck.push({ type: "civil", word: currentPair.civil });
@@ -459,7 +312,7 @@
         headerDisplay.innerText = `${current.name}, tu es :`;
         wordDisplay.innerText = "Mr. White";
         wordDisplay.className = "secret-word white-role";
-        hintDisplay.innerText = "Tu n'as aucun mot ! Écoute les indices et bluffe sans te faire repérer.";
+        hintDisplay.innerText = "Tu n'as aucun mot ! Écoute bien et bluffe.";
       } else {
         headerDisplay.innerText = `${current.name}, ton mot secret :`;
         wordDisplay.innerText = current.word;
@@ -479,7 +332,6 @@
       }
     }
 
-    // Phase de Vote
     function showVoteScreen() {
       hideAllScreens();
       const alivePlayers = players.filter(p => p.alive);
@@ -535,44 +387,72 @@
       const actualWord = currentPair.civil.toLowerCase();
 
       if (guess === actualWord) {
-        endGame(`${eliminatedPlayer.name} (Mr. White) vole la victoire !`, `Il a trouvé le mot des civils ("${currentPair.civil}").`);
+        addPoints(eliminatedPlayer.name, 10);
+        showScoreboard(false, `${eliminatedPlayer.name} (Mr. White) gagne la manche !`, `Devinette réussie ("${currentPair.civil}") ! Il remporte +10 points.`);
       } else {
-        alert(`Mauvais mot ! Le mot civil était "${currentPair.civil}". ${eliminatedPlayer.name} est éliminé définitivement.`);
+        alert(`Mauvais mot ! Le mot civil était "${currentPair.civil}".`);
         checkGameState();
       }
     }
 
     function checkGameState() {
-        const alivePlayers = players.filter(p => p.alive);
-        const civilsAlive = alivePlayers.filter(p => p.type === 'civil').length;
-        const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
+      const alivePlayers = players.filter(p => p.alive);
+      const civilsAlive = alivePlayers.filter(p => p.type === 'civil').length;
+      const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
 
-        // 1. Victoire des Civils : tous les imposteurs ont été éliminés
-        if (impostorsAlive === 0) {
-            endGame("Victoire des Civils !", `Tous les imposteurs ont été démasqués. Le mot était "${currentPair.civil}".`);
-            return;
-        }
+      // Victoire des Civils
+      if (impostorsAlive === 0) {
+        players.forEach(p => {
+          if (p.type === "civil") addPoints(p.name, p.alive ? 2 : 1);
+        });
+        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs ont été éliminés (+2 pts aux survivants, +1 pt aux éliminés).`);
+        return;
+      }
 
-        // 2. Victoire des Imposteurs : ils sont strictement plus nombreux que les civils (ou 1 seul civil restant)
-        if (impostorsAlive > civilsAlive || civilsAlive <= 1) {
-            endGame("Victoire des Imposteurs !", `Les imposteurs ont pris le dessus. Civils : "${currentPair.civil}" | Undercovers : "${currentPair.undercover}".`);
-            return;
-        }
+      // Victoire des Imposteurs (quand il reste moins ou autant de civils que d'imposteurs)
+      if (impostorsAlive > civilsAlive || civilsAlive <= 1) {
+        players.forEach(p => {
+          if (p.type === "undercover") addPoints(p.name, p.alive ? 6 : 3);
+          if (p.type === "white" && p.alive) addPoints(p.name, 6);
+        });
+        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs remportent la manche (+6 pts aux survivants).`);
+        return;
+      }
 
-        // 3. Le jeu continue : il reste autant ou plus de civils que d'imposteurs (civils >= imposteurs)
-        showVoteScreen();
+      showVoteScreen();
     }
 
-    function endGame(title, desc) {
+    function showScoreboard(fromMenu = false, title = "Tableau des Scores", desc = "") {
       hideAllScreens();
       document.getElementById("winner-title").innerText = title;
       document.getElementById("winner-desc").innerText = desc;
-      document.getElementById("gameover-screen").classList.remove("hidden");
+
+      const scores = getScores();
+      const tbody = document.getElementById("score-table-body");
+      tbody.innerHTML = "";
+
+      // Tri des joueurs par score décroissant
+      const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+
+      sorted.forEach(([name, score]) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${name}</td><td>${score} pts</td>`;
+        tbody.appendChild(row);
+      });
+
+      document.getElementById("scoreboard-screen").classList.remove("hidden");
     }
 
-    function resetGame() {
+    function restartMatch() {
       hideAllScreens();
       document.getElementById("setup-screen").classList.remove("hidden");
+    }
+
+    function resetAllScores() {
+      if (confirm("Réinitialiser tous les scores de tous les joueurs à 0 ?")) {
+        localStorage.removeItem("undercover_scores");
+        showScoreboard(true, "Scores réinitialisés", "Tous les compteurs sont à 0.");
+      }
     }
   </script>
 </body>
