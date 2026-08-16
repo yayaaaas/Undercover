@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jeu Undercover & Mr. White</title>
+  <title>Undercover - Jeu Complet</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -14,14 +14,16 @@
       align-items: center;
       min-height: 100vh;
       margin: 0;
+      padding: 10px;
+      box-sizing: border-box;
     }
     .card {
       background: #313244;
       padding: 1.5rem 2rem;
       border-radius: 12px;
       text-align: center;
-      max-width: 400px;
-      width: 90%;
+      max-width: 450px;
+      width: 100%;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     .input-group {
@@ -30,9 +32,8 @@
       align-items: center;
       margin: 10px 0;
     }
-    input[type="number"] {
-      width: 60px;
-      padding: 6px;
+    input[type="number"], input[type="text"] {
+      padding: 8px;
       border-radius: 6px;
       border: 1px solid #45475a;
       background: #181825;
@@ -40,6 +41,8 @@
       text-align: center;
       font-size: 1rem;
     }
+    input[type="number"] { width: 60px; }
+    input[type="text"] { width: 80%; margin: 10px 0; }
     button {
       background: #89b4fa;
       color: #11111b;
@@ -50,8 +53,11 @@
       border-radius: 6px;
       cursor: pointer;
       margin-top: 15px;
+      transition: background 0.2s;
     }
     button:hover { background: #b4befe; }
+    .btn-danger { background: #f38ba8; color: #11111b; }
+    .btn-danger:hover { background: #eba0ac; }
     .hidden { display: none; }
     .secret-word {
       font-size: 1.6rem;
@@ -59,14 +65,30 @@
       font-weight: bold;
       margin: 20px 0;
     }
-    .white-role {
-      color: #f38ba8;
+    .white-role { color: #f38ba8; }
+    .vote-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 15px 0;
+    }
+    .vote-btn {
+      width: 100%;
+      margin: 0;
+      background: #45475a;
+      color: #cdd6f4;
+    }
+    .vote-btn:hover { background: #585b70; }
+    .alive-count {
+      font-size: 0.9rem;
+      color: #bac2de;
+      margin-bottom: 15px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Écran de configuration -->
+  <!-- 1. Configuration -->
   <div class="card" id="setup-screen">
     <h2>Configuration</h2>
     <div class="input-group">
@@ -81,29 +103,53 @@
       <label>Mr. White :</label>
       <input type="number" id="nb-whites" value="1" min="0">
     </div>
-    <button onclick="startGame()">Lancer la partie</button>
+    <button onclick="startGame()">Lancer la distribution</button>
   </div>
 
-  <!-- Écran de transition -->
+  <!-- 2. Écran intermédiaire (Passer le téléphone) -->
   <div class="card hidden" id="pass-screen">
     <h2 id="player-title">Joueur 1</h2>
     <p>Prenez l'appareil sans montrer l'écran.</p>
     <button onclick="showRole()">Voir mon rôle / mot</button>
   </div>
 
-  <!-- Écran de révélation -->
+  <!-- 3. Révélation du mot -->
   <div class="card hidden" id="reveal-screen">
-    <h2 id="reveal-header">Votre mot :</h2>
+    <h2 id="reveal-header">Votre mot secret :</h2>
     <div class="secret-word" id="word-display">---</div>
     <p id="role-hint">Mémorisez-le bien !</p>
     <button onclick="nextPlayer()">Cacher et passer</button>
   </div>
 
-  <!-- Écran de fin de distribution -->
-  <div class="card hidden" id="end-screen">
-    <h2>Distribution terminée !</h2>
-    <p>Le débat commence. Donnez chacun un indice sans vous faire démasquer.</p>
-    <button onclick="resetGame()">Nouvelle partie</button>
+  <!-- 4. Phase de débat et de vote -->
+  <div class="card hidden" id="vote-screen">
+    <h2>Phase de Vote</h2>
+    <p class="alive-count" id="alive-status"></p>
+    <p>Après le tour de parole, choisissez qui éliminer :</p>
+    <div class="vote-list" id="vote-buttons"></div>
+  </div>
+
+  <!-- 5. Révélation de l'élimination -->
+  <div class="card hidden" id="eliminated-screen">
+    <h2 id="elim-title">Joueur éliminé</h2>
+    <p id="elim-desc"></p>
+    <button id="elim-next-btn" onclick="continueAfterElimination()">Continuer</button>
+  </div>
+
+  <!-- 6. Tentative Mr. White -->
+  <div class="card hidden" id="white-guess-screen">
+    <h2 class="white-role">Dernière chance pour Mr. White !</h2>
+    <p>Mr. White a été démasqué mais peut voler la victoire s'il devine le mot des civils :</p>
+    <input type="text" id="white-guess-input" placeholder="Tapez le mot ici">
+    <br>
+    <button onclick="checkWhiteGuess()">Valider la devinette</button>
+  </div>
+
+  <!-- 7. Fin de partie -->
+  <div class="card hidden" id="gameover-screen">
+    <h2 id="winner-title">Fin de partie</h2>
+    <p id="winner-desc"></p>
+    <button onclick="resetGame()">Rejouer</button>
   </div>
 
   <script>
@@ -113,11 +159,22 @@
       { civil: "Guitare", undercover: "Violon" },
       { civil: "Avion", undercover: "Hélicoptère" },
       { civil: "Pizza", undercover: "Burger" },
-      { civil: "Soleil", undercover: "Lune" }
+      { civil: "Soleil", undercover: "Lune" },
+      { civil: "Pomme", undercover: "Poire" }
     ];
 
+    let currentPair = null;
     let players = [];
     let currentPlayerIndex = 0;
+    let eliminatedPlayer = null;
+
+    function hideAllScreens() {
+      const screens = [
+        "setup-screen", "pass-screen", "reveal-screen",
+        "vote-screen", "eliminated-screen", "white-guess-screen", "gameover-screen"
+      ];
+      screens.forEach(id => document.getElementById(id).classList.add("hidden"));
+    }
 
     function startGame() {
       const civilsCount = parseInt(document.getElementById("nb-civils").value) || 0;
@@ -129,40 +186,38 @@
         return;
       }
 
-      const pair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+      currentPair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
       players = [];
 
+      let idCounter = 1;
       for (let i = 0; i < civilsCount; i++) {
-        players.push({ type: "civil", word: pair.civil });
+        players.push({ id: idCounter++, type: "civil", word: currentPair.civil, alive: true });
       }
       for (let i = 0; i < undercoversCount; i++) {
-        players.push({ type: "undercover", word: pair.undercover });
+        players.push({ id: idCounter++, type: "undercover", word: currentPair.undercover, alive: true });
       }
       for (let i = 0; i < whitesCount; i++) {
-        players.push({ type: "white", word: null });
+        players.push({ id: idCounter++, type: "white", word: null, alive: true });
       }
 
-      // Mélange aléatoire (Fisher-Yates)
-      for (let i = players.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [players[i], players[j]] = [players[j], players[i]];
-      }
+      // Mélange aléatoire des rôles
+      players.sort(() => Math.random() - 0.5);
+
+      // Attribution d'un numéro d'affichage propre
+      players.forEach((p, idx) => p.name = `Joueur ${idx + 1}`);
 
       currentPlayerIndex = 0;
       showPassScreen();
     }
 
     function showPassScreen() {
-      document.getElementById("setup-screen").classList.add("hidden");
-      document.getElementById("reveal-screen").classList.add("hidden");
-      document.getElementById("end-screen").classList.add("hidden");
-
-      document.getElementById("player-title").innerText = `Joueur ${currentPlayerIndex + 1}`;
+      hideAllScreens();
+      document.getElementById("player-title").innerText = players[currentPlayerIndex].name;
       document.getElementById("pass-screen").classList.remove("hidden");
     }
 
     function showRole() {
-      document.getElementById("pass-screen").classList.add("hidden");
+      hideAllScreens();
       const current = players[currentPlayerIndex];
       const wordDisplay = document.getElementById("word-display");
       const headerDisplay = document.getElementById("reveal-header");
@@ -172,7 +227,7 @@
         headerDisplay.innerText = "Vous êtes :";
         wordDisplay.innerText = "Mr. White";
         wordDisplay.className = "secret-word white-role";
-        hintDisplay.innerText = "Vous n'avez aucun mot ! Bluffez et devinez le mot des civils.";
+        hintDisplay.innerText = "Vous n'avez aucun mot ! Écoutez et bluffez.";
       } else {
         headerDisplay.innerText = "Votre mot secret :";
         wordDisplay.innerText = current.word;
@@ -188,13 +243,102 @@
       if (currentPlayerIndex < players.length) {
         showPassScreen();
       } else {
-        document.getElementById("reveal-screen").classList.add("hidden");
-        document.getElementById("end-screen").classList.remove("hidden");
+        showVoteScreen();
       }
     }
 
+    function showVoteScreen() {
+      hideAllScreens();
+      const alivePlayers = players.filter(p => p.alive);
+      
+      const civilsAlive = alivePlayers.filter(p => p.type === 'civil').length;
+      const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
+      
+      document.getElementById("alive-status").innerText = 
+        `Joueurs restants : ${alivePlayers.length} (Civils : ${civilsAlive} | Ennemis : ${impostorsAlive})`;
+
+      const buttonsContainer = document.getElementById("vote-buttons");
+      buttonsContainer.innerHTML = "";
+
+      alivePlayers.forEach(player => {
+        const btn = document.createElement("button");
+        btn.className = "vote-btn";
+        btn.innerText = `Éliminer ${player.name}`;
+        btn.onclick = () => eliminatePlayer(player);
+        buttonsContainer.appendChild(btn);
+      });
+
+      document.getElementById("vote-screen").classList.remove("hidden");
+    }
+
+    function eliminatePlayer(player) {
+      player.alive = false;
+      eliminatedPlayer = player;
+
+      hideAllScreens();
+      document.getElementById("elim-title").innerText = `${player.name} a été éliminé !`;
+      
+      let roleText = "";
+      if (player.type === "civil") roleText = `C'était un Civil (Mot : ${player.word}).`;
+      if (player.type === "undercover") roleText = `C'était un Undercover (Mot : ${player.word}).`;
+      if (player.type === "white") roleText = `C'était Mr. White !`;
+
+      document.getElementById("elim-desc").innerText = roleText;
+      document.getElementById("eliminated-screen").classList.remove("hidden");
+    }
+
+    function continueAfterElimination() {
+      if (eliminatedPlayer.type === "white") {
+        hideAllScreens();
+        document.getElementById("white-guess-input").value = "";
+        document.getElementById("white-guess-screen").classList.remove("hidden");
+        return;
+      }
+      checkGameState();
+    }
+
+    function checkWhiteGuess() {
+      const guess = document.getElementById("white-guess-input").value.trim().toLowerCase();
+      const actualWord = currentPair.civil.toLowerCase();
+
+      if (guess === actualWord) {
+        endGame("Mr. White a gagné !", `Il a correctement deviné le mot des civils ("${currentPair.civil}") !`);
+      } else {
+        alert(`Faux ! Le mot était "${currentPair.civil}". Mr. White est définitivement éliminé.`);
+        checkGameState();
+      }
+    }
+
+    function checkGameState() {
+      const alivePlayers = players.filter(p => p.alive);
+      const civilsAlive = alivePlayers.filter(p => p.type === 'civil').length;
+      const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
+
+      // Les Civils gagnent s'il n'y a plus d'Undercover ni de Mr. White
+      if (impostorsAlive === 0) {
+        endGame("Victoire des Civils !", `Tous les imposteurs ont été démasqués. Le mot était "${currentPair.civil}".`);
+        return;
+      }
+
+      // Les Imposteurs gagnent s'ils sont en nombre supérieur ou égal aux civils
+      if (impostorsAlive >= civilsAlive) {
+        endGame("Victoire des Imposteurs !", `Les imposteurs sont majoritaires. Mots : Civil = "${currentPair.civil}", Undercover = "${currentPair.undercover}".`);
+        return;
+      }
+
+      // La partie continue
+      showVoteScreen();
+    }
+
+    function endGame(title, desc) {
+      hideAllScreens();
+      document.getElementById("winner-title").innerText = title;
+      document.getElementById("winner-desc").innerText = desc;
+      document.getElementById("gameover-screen").classList.remove("hidden");
+    }
+
     function resetGame() {
-      document.getElementById("end-screen").classList.add("hidden");
+      hideAllScreens();
       document.getElementById("setup-screen").classList.remove("hidden");
     }
   </script>
