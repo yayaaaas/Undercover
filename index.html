@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Undercover - Mode Mystère Total</title>
+  <title>Undercover - Édition Avancée</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,14 +22,14 @@
       padding: 1.5rem 2rem;
       border-radius: 12px;
       text-align: center;
-      max-width: 460px;
+      max-width: 480px;
       width: 100%;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
     .tab-container {
       display: flex;
       gap: 6px;
-      margin-bottom: 20px;
+      margin-bottom: 15px;
       background: #181825;
       padding: 4px;
       border-radius: 8px;
@@ -37,7 +37,7 @@
     .tab-btn {
       flex: 1;
       padding: 8px 6px;
-      font-size: 0.82rem;
+      font-size: 0.8rem;
       border-radius: 6px;
       border: none;
       background: transparent;
@@ -47,32 +47,29 @@
       margin: 0;
       transition: all 0.2s;
     }
-    .tab-btn.active {
-      background: #89b4fa;
-      color: #11111b;
-    }
+    .tab-btn.active { background: #89b4fa; color: #11111b; }
     .input-group {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin: 12px 0;
+      margin: 10px 0;
     }
-    input[type="number"], input[type="text"] {
+    input[type="number"], input[type="text"], select {
       padding: 8px 12px;
       border-radius: 6px;
       border: 1px solid #45475a;
       background: #181825;
       color: #cdd6f4;
-      font-size: 1rem;
+      font-size: 0.95rem;
       box-sizing: border-box;
     }
     input[type="number"] { width: 70px; text-align: center; }
-    input[type="text"] { width: 100%; text-align: left; }
+    input[type="text"], select { width: 100%; }
     .name-inputs-list {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-height: 220px;
+      max-height: 200px;
       overflow-y: auto;
       margin: 15px 0;
       padding-right: 5px;
@@ -93,18 +90,16 @@
     button:hover { background: #b4befe; }
     .btn-secondary { background: #45475a; color: #cdd6f4; }
     .btn-secondary:hover { background: #585b70; }
+    .btn-warning { background: #fab387; color: #11111b; }
+    .btn-warning:hover { background: #f9e2af; }
     .hidden { display: none; }
     .secret-word {
       font-size: 1.6rem;
       color: #a6e3a1;
       font-weight: bold;
-      margin: 20px 0;
+      margin: 15px 0;
     }
     .white-role { color: #f38ba8; }
-    .vote-list { display: flex; flex-direction: column; gap: 10px; margin: 15px 0; }
-    .vote-btn { background: #45475a; color: #cdd6f4; margin-top: 0; }
-    .vote-btn:hover { background: #585b70; }
-    .alive-count { font-size: 0.95rem; color: #bac2de; margin-bottom: 15px; }
     .badge {
       background: #181825;
       padding: 8px 12px;
@@ -112,7 +107,44 @@
       font-size: 0.85rem;
       color: #fab387;
       display: block;
-      margin: 10px 0 15px 0;
+      margin: 10px 0;
+    }
+    .power-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      background: #cba6f7;
+      color: #11111b;
+      font-size: 0.8rem;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .order-box {
+      background: #181825;
+      padding: 12px;
+      border-radius: 8px;
+      margin: 15px 0;
+      text-align: left;
+    }
+    .order-step {
+      padding: 6px 0;
+      border-bottom: 1px solid #313244;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .order-step:last-child { border-bottom: none; }
+    .order-number {
+      background: #89b4fa;
+      color: #11111b;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 0.8rem;
     }
     .score-table {
       width: 100%;
@@ -129,11 +161,21 @@
     }
     .score-table th { background: #11111b; color: #89b4fa; }
     .score-table td:last-child { text-align: right; font-weight: bold; color: #f9e2af; }
+    .vote-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #181825;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+    .vote-item select { width: 55%; margin: 0; }
   </style>
 </head>
 <body>
 
-  <!-- 1. Configuration avec 3 Modes -->
+  <!-- 1. CONFIGURATION -->
   <div class="card" id="setup-screen">
     <h2>Configuration</h2>
 
@@ -143,16 +185,16 @@
       <button class="tab-btn" id="tab-manual" onclick="setMode('manual')">✏️ Manuel</button>
     </div>
 
-    <!-- Mode 1 : Mystère Total -->
+    <!-- Mode Mystère -->
     <div id="mode-mystery-view">
       <div class="input-group">
         <label>Nombre total de joueurs :</label>
         <input type="number" id="total-mystery-players" value="5" min="3" max="20">
       </div>
-      <div class="badge">❓ Rôles secrets inconnus (peut-être 0 Mr. White ou 0 Undercover)</div>
+      <div class="badge">❓ Rôles secrets imprévisibles (Undercovers / Mr. White variables)</div>
     </div>
 
-    <!-- Mode 2 : Automatique / Équilibré classique -->
+    <!-- Mode Auto -->
     <div id="mode-auto-view" class="hidden">
       <div class="input-group">
         <label>Nombre total de joueurs :</label>
@@ -161,7 +203,7 @@
       <div class="badge" id="auto-preview-badge">Civils : 3 | Undercover : 1 | Mr. White : 1</div>
     </div>
 
-    <!-- Mode 3 : Manuel -->
+    <!-- Mode Manuel -->
     <div id="mode-manual-view" class="hidden">
       <div class="input-group">
         <label>Civils :</label>
@@ -178,51 +220,89 @@
       <div class="badge" id="manual-total-badge">Total : 5 joueurs</div>
     </div>
 
+    <!-- Gestion des Rôles Secondaires -->
+    <div style="margin-top: 15px; text-align: left;">
+      <label style="font-size: 0.9rem; color: #cba6f7; font-weight: bold;">Pouvoirs Secondaires :</label>
+      <select id="secondary-roles-mode" onchange="toggleSecondarySettings()">
+        <option value="none">Désactivés</option>
+        <option value="mystery" selected>❓ Mystère (0, 1 ou plusieurs pouvoirs secrets)</option>
+        <option value="manual">✏️ Choisir manuellement</option>
+      </select>
+    </div>
+
+    <div id="manual-secondary-box" class="hidden" style="margin-top: 10px; background: #181825; padding: 10px; border-radius: 6px;">
+      <label style="display: flex; gap: 8px; margin-bottom: 6px; font-size: 0.85rem;">
+        <input type="checkbox" id="role-mayor"> 👑 Le Maire (Son vote compte double)
+      </label>
+      <label style="display: flex; gap: 8px; margin-bottom: 6px; font-size: 0.85rem;">
+        <input type="checkbox" id="role-shield"> 🛡️ Le Bouclier (Survit à 1 élimination)
+      </label>
+      <label style="display: flex; gap: 8px; font-size: 0.85rem;">
+        <input type="checkbox" id="role-mute"> 🤐 Le Muet (Ne parle pas, mime uniquement)
+      </label>
+    </div>
+
     <button onclick="goToNamesScreen()">Suivant : Nommer les joueurs</button>
     <button class="btn-secondary" onclick="showScoreboard(true)">🏆 Tableau des Scores</button>
   </div>
 
-  <!-- 2. Saisie des prénoms -->
+  <!-- 2. SAISIE DES PRÉNOMS -->
   <div class="card hidden" id="names-screen">
     <h2>Noms des Joueurs</h2>
-    <p style="font-size: 0.9rem; color: #a6adc8;">Entrez le prénom de chaque participant :</p>
+    <p style="font-size: 0.9rem; color: #a6adc8;">Entrez le nom de chaque participant :</p>
     <div class="name-inputs-list" id="names-container"></div>
     <button onclick="startGame()">Lancer la manche</button>
     <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">Retour</button>
   </div>
 
-  <!-- 3. Passage du téléphone -->
+  <!-- 3. PASSAGE DU TÉLÉPHONE -->
   <div class="card hidden" id="pass-screen">
     <h2>À ton tour !</h2>
     <p>Donnez le téléphone à <strong id="player-target-name" style="color: #89b4fa;">---</strong>.</p>
     <p style="font-size: 0.85rem; color: #a6adc8;">Regardez l'écran à l'abri des regards.</p>
-    <button onclick="showRole()">Voir mon mot</button>
+    <button onclick="showRole()">Voir mon mot & pouvoir</button>
   </div>
 
-  <!-- 4. Révélation du mot -->
+  <!-- 4. RÉVÉLATION SECRÈTE -->
   <div class="card hidden" id="reveal-screen">
     <h2 id="reveal-header">Votre mot secret :</h2>
     <div class="secret-word" id="word-display">---</div>
-    <p id="role-hint">Mémorisez-le bien et restez discret !</p>
+    <div id="power-display"></div>
+    <p id="role-hint" style="margin-top: 15px;">Mémorisez-le bien et restez discret !</p>
     <button onclick="nextPlayer()">Cacher et passer</button>
   </div>
 
-  <!-- 5. Vote -->
-  <div class="card hidden" id="vote-screen">
-    <h2>Phase de Vote</h2>
-    <p class="alive-count" id="alive-status"></p>
-    <p>Après le tour de parole, choisissez qui éliminer :</p>
-    <div class="vote-list" id="vote-buttons"></div>
+  <!-- 5. ORDRE DE PAROLE / DÉBAT -->
+  <div class="card hidden" id="debate-screen">
+    <h2>Tour de Parole</h2>
+    <p style="font-size: 0.9rem; color: #a6adc8;">Donnez un mot-indice chacun en respectant cet ordre :</p>
+    <div class="order-box" id="speech-order-list"></div>
+    <button onclick="openVotePhase()">Passer au Vote</button>
   </div>
 
-  <!-- 6. Élimination -->
+  <!-- 6. VOTE INDIVIDUEL ET ÉGALITÉS -->
+  <div class="card hidden" id="vote-screen">
+    <h2>Phase de Vote</h2>
+    <p style="font-size: 0.85rem; color: #a6adc8;">Chaque joueur vivant choisit qui il accuse (ou vote blanc) :</p>
+    <div class="name-inputs-list" id="vote-inputs-container"></div>
+    <button onclick="processVotes()">Dépouiller les votes</button>
+  </div>
+
+  <!-- 7. RÉSULTAT ÉGALITÉ / VOTE BLANC (TOUR SANS VOTE) -->
+  <div class="card hidden" id="tie-screen">
+    <h2 class="white-role">⚖️ Égalité ou Vote Blanc !</h2>
+    <p id="tie-desc">Les votes n'ont pas permis de trancher. Aucun joueur n'est éliminé ce tour-ci !</p>
+    <button onclick="startNewSpeechRound()">Nouveau tour de parole</button>
+  </div>
+
+  <!-- 8. RÉVÉLATION DE L'ÉLIMINATION -->
   <div class="card hidden" id="eliminated-screen">
     <h2 id="elim-title">Joueur éliminé</h2>
     <p id="elim-desc"></p>
     <button onclick="continueAfterElimination()">Continuer</button>
   </div>
 
-  <!-- 7. Devinette Mr. White -->
+  <!-- 9. DEVIENTTE MR. WHITE -->
   <div class="card hidden" id="white-guess-screen">
     <h2 class="white-role">Dernière chance Mr. White !</h2>
     <p><strong id="white-player-name"></strong> peut voler la victoire (+10 pts) en devinant le mot des Civils :</p>
@@ -230,7 +310,7 @@
     <button onclick="checkWhiteGuess()">Valider la tentative</button>
   </div>
 
-  <!-- 8. Tableau des scores -->
+  <!-- 10. TABLEAU DES SCORES -->
   <div class="card hidden" id="scoreboard-screen">
     <h2 id="winner-title">Fin de Manche</h2>
     <p id="winner-desc"></p>
@@ -258,7 +338,7 @@
       { civil: "Soleil", undercover: "Lune" }
     ];
 
-    let currentMode = "mystery"; // "mystery", "auto", "manual"
+    let currentMode = "mystery";
     let counts = { civils: 3, undercovers: 1, whites: 1 };
     let currentPair = null;
     let players = [];
@@ -276,25 +356,20 @@
       if (mode === "manual") updateManualTotal();
     }
 
-    // Tirage aléatoire imprévisible (mode mystère)
+    function toggleSecondarySettings() {
+      const mode = document.getElementById("secondary-roles-mode").value;
+      document.getElementById("manual-secondary-box").classList.toggle("hidden", mode !== "manual");
+    }
+
     function generateMysteryRoles(total) {
       let maxImpostors = Math.floor((total - 1) / 2);
-      let totalImpostors = Math.floor(Math.random() * maxImpostors) + 1; // Au moins 1 imposteur
-
-      let undercovers = 0;
-      let whites = 0;
-
+      let totalImpostors = Math.floor(Math.random() * maxImpostors) + 1;
+      let undercovers = 0, whites = 0;
       for (let i = 0; i < totalImpostors; i++) {
-        if (Math.random() < 0.6) {
-          undercovers++;
-        } else {
-          whites++;
-        }
+        if (Math.random() < 0.6) undercovers++;
+        else whites++;
       }
-
-      // Si le tirage a donné 0 des deux (cas limite), on force 1 Undercover
       if (undercovers === 0 && whites === 0) undercovers = 1;
-
       let civils = total - undercovers - whites;
       return { civils, undercovers, whites };
     }
@@ -305,7 +380,6 @@
       if (total === 5) return { civils: 3, undercovers: 1, whites: 1 };
       if (total === 6) return { civils: 4, undercovers: 1, whites: 1 };
       if (total <= 8) return { civils: total - 3, undercovers: 2, whites: 1 };
-      
       const whites = Math.random() > 0.4 ? 1 : 2;
       const undercovers = Math.max(2, Math.floor(total * 0.25));
       const civils = total - undercovers - whites;
@@ -329,7 +403,8 @@
     function hideAllScreens() {
       const screens = [
         "setup-screen", "names-screen", "pass-screen", "reveal-screen", 
-        "vote-screen", "eliminated-screen", "white-guess-screen", "scoreboard-screen"
+        "debate-screen", "vote-screen", "tie-screen", "eliminated-screen", 
+        "white-guess-screen", "scoreboard-screen"
       ];
       screens.forEach(id => document.getElementById(id).classList.add("hidden"));
     }
@@ -405,13 +480,31 @@
       for (let i = 0; i < counts.civils; i++) roleDeck.push({ type: "civil", word: currentPair.civil });
       for (let i = 0; i < counts.undercovers; i++) roleDeck.push({ type: "undercover", word: currentPair.undercover });
       for (let i = 0; i < counts.whites; i++) roleDeck.push({ type: "white", word: null });
-
       roleDeck.sort(() => Math.random() - 0.5);
 
+      // Attribution des rôles secondaires
+      const secMode = document.getElementById("secondary-roles-mode").value;
+      let powersDeck = new Array(totalPlayersCount).fill(null);
+
+      if (secMode === "manual") {
+        let chosen = [];
+        if (document.getElementById("role-mayor").checked) chosen.push("mayor");
+        if (document.getElementById("role-shield").checked) chosen.push("shield");
+        if (document.getElementById("role-mute").checked) chosen.push("mute");
+        chosen.forEach((p, idx) => { if (idx < powersDeck.length) powersDeck[idx] = p; });
+        powersDeck.sort(() => Math.random() - 0.5);
+      } else if (secMode === "mystery") {
+        const possible = ["mayor", "shield", "mute"];
+        powersDeck = powersDeck.map(() => (Math.random() < 0.35 ? possible[Math.floor(Math.random() * possible.length)] : null));
+      }
+
       players = enteredNames.map((name, index) => ({
+        id: index,
         name: name,
         type: roleDeck[index].type,
         word: roleDeck[index].word,
+        power: powersDeck[index],
+        hasShield: powersDeck[index] === "shield",
         alive: true
       }));
 
@@ -432,6 +525,7 @@
       const wordDisplay = document.getElementById("word-display");
       const headerDisplay = document.getElementById("reveal-header");
       const hintDisplay = document.getElementById("role-hint");
+      const powerDisplay = document.getElementById("power-display");
 
       if (current.type === "white") {
         headerDisplay.innerText = `${current.name}, tu es :`;
@@ -445,6 +539,16 @@
         hintDisplay.innerText = "Mémorise-le bien et reste discret !";
       }
 
+      // Affichage du pouvoir secondaire
+      powerDisplay.innerHTML = "";
+      if (current.power === "mayor") {
+        powerDisplay.innerHTML = `<div class="power-badge">👑 Rôle secondaire : Le Maire (Ton vote compte double)</div>`;
+      } else if (current.power === "shield") {
+        powerDisplay.innerHTML = `<div class="power-badge">🛡️ Rôle secondaire : Le Bouclier (Survit à 1 élimination)</div>`;
+      } else if (current.power === "mute") {
+        powerDisplay.innerHTML = `<div class="power-badge">🤐 Rôle secondaire : Le Muet (Tu n'as pas le droit de parler !)</div>`;
+      }
+
       document.getElementById("reveal-screen").classList.remove("hidden");
     }
 
@@ -453,32 +557,123 @@
       if (currentPlayerIndex < players.length) {
         showPassScreen();
       } else {
-        showVoteScreen();
+        startNewSpeechRound();
       }
     }
 
-    function showVoteScreen() {
+    // 1. Ordre de parole aléatoire
+    function startNewSpeechRound() {
       hideAllScreens();
-      const alivePlayers = players.filter(p => p.alive);
+      const alive = players.filter(p => p.alive);
+      
+      // Tirage d'un ordre aléatoire parmi les survivants
+      const speechOrder = [...alive].sort(() => Math.random() - 0.5);
+      const container = document.getElementById("speech-order-list");
+      container.innerHTML = "";
 
-      // En mode mystère ou classique, on affiche uniquement le nombre total de survivants pour ne rien trahir
-      document.getElementById("alive-status").innerText = `Joueurs restants en lice : ${alivePlayers.length}`;
+      speechOrder.forEach((player, idx) => {
+        const div = document.createElement("div");
+        div.className = "order-step";
+        div.innerHTML = `
+          <div class="order-number">${idx + 1}</div>
+          <div>
+            <strong>${player.name}</strong> 
+            ${idx === 0 ? '<span style="color:#a6e3a1; font-size:0.8rem;">(Commence en 1er)</span>' : ''}
+            ${player.power === 'mute' ? '<span style="color:#f38ba8; font-size:0.8rem;">🤐 (Muet)</span>' : ''}
+          </div>
+        `;
+        container.appendChild(div);
+      });
 
-      const buttonsContainer = document.getElementById("vote-buttons");
-      buttonsContainer.innerHTML = "";
+      document.getElementById("debate-screen").classList.remove("hidden");
+    }
 
-      alivePlayers.forEach(player => {
-        const btn = document.createElement("button");
-        btn.className = "vote-btn";
-        btn.innerText = `Voter contre ${player.name}`;
-        btn.onclick = () => eliminatePlayer(player);
-        buttonsContainer.appendChild(btn);
+    // 2. Préparation du vote individuel
+    function openVotePhase() {
+      hideAllScreens();
+      const alive = players.filter(p => p.alive);
+      const container = document.getElementById("vote-inputs-container");
+      container.innerHTML = "";
+
+      alive.forEach(voter => {
+        const row = document.createElement("div");
+        row.className = "vote-item";
+        
+        let options = `<option value="-1">⚪ Vote blanc / Passer</option>`;
+        alive.forEach(suspect => {
+          if (suspect.id !== voter.id) {
+            options += `<option value="${suspect.id}">${suspect.name}</option>`;
+          }
+        });
+
+        row.innerHTML = `
+          <span><strong>${voter.name}</strong> ${voter.power === 'mayor' ? '👑' : ''}</span>
+          <select id="vote-from-${voter.id}">${options}</select>
+        `;
+        container.appendChild(row);
       });
 
       document.getElementById("vote-screen").classList.remove("hidden");
     }
 
-    function eliminatePlayer(player) {
+    // 3. Dépouillement des votes et gestion des égalités
+    function processVotes() {
+      const alive = players.filter(p => p.alive);
+      let tally = {};
+      alive.forEach(p => tally[p.id] = 0);
+      let blankVotes = 0;
+
+      alive.forEach(voter => {
+        const targetId = parseInt(document.getElementById(`vote-from-${voter.id}`).value);
+        const weight = voter.power === "mayor" ? 2 : 1; // Le maire pèse double
+        
+        if (targetId === -1) {
+          blankVotes += weight;
+        } else {
+          tally[targetId] = (tally[targetId] || 0) + weight;
+        }
+      });
+
+      // Trouver le(s) suspect(s) ayant le plus de voix
+      let maxVotes = 0;
+      let topSuspects = [];
+
+      for (const [id, count] of Object.entries(tally)) {
+        if (count > maxVotes) {
+          maxVotes = count;
+          topSuspects = [parseInt(id)];
+        } else if (count === maxVotes && maxVotes > 0) {
+          topSuspects.push(parseInt(id));
+        }
+      }
+
+      // Cas d'égalité ou de majorité de vote blanc -> Tour sans vote
+      if (maxVotes === 0 || blankVotes >= maxVotes || topSuspects.length > 1) {
+        hideAllScreens();
+        if (topSuspects.length > 1) {
+          const names = topSuspects.map(id => players.find(p => p.id === id).name).join(" et ");
+          document.getElementById("tie-desc").innerText = `Égalité parfaite entre ${names} (${maxVotes} voix chacun). Personne n'est éliminé !`;
+        } else {
+          document.getElementById("tie-desc").innerText = `Le vote blanc l'a emporté. Aucun joueur n'est éliminé ce tour-ci !`;
+        }
+        document.getElementById("tie-screen").classList.remove("hidden");
+        return;
+      }
+
+      // Élimination du suspect désigné
+      const eliminated = players.find(p => p.id === topSuspects[0]);
+      handleElimination(eliminated);
+    }
+
+    function handleElimination(player) {
+      // Vérification du pouvoir Bouclier
+      if (player.hasShield) {
+        player.hasShield = false;
+        alert(`🛡️ ${player.name} possédait le Bouclier ! L'élimination a été bloquée. Il reste en jeu !`);
+        startNewSpeechRound();
+        return;
+      }
+
       player.alive = false;
       eliminatedPlayer = player;
 
@@ -489,6 +684,11 @@
       if (player.type === "civil") roleText = `C'était un Civil (Mot : "${player.word}").`;
       if (player.type === "undercover") roleText = `C'était un Undercover (Mot : "${player.word}").`;
       if (player.type === "white") roleText = `C'était Mr. White !`;
+
+      if (player.power) {
+        const map = { mayor: "Le Maire 👑", shield: "Le Bouclier 🛡️", mute: "Le Muet 🤐" };
+        roleText += ` (Pouvoir : ${map[player.power]})`;
+      }
 
       document.getElementById("elim-desc").innerText = roleText;
       document.getElementById("eliminated-screen").classList.remove("hidden");
@@ -511,7 +711,7 @@
 
       if (guess === actualWord) {
         addPoints(eliminatedPlayer.name, 10);
-        showScoreboard(false, `${eliminatedPlayer.name} (Mr. White) vole la victoire !`, `Devinette réussie ("${currentPair.civil}") ! Il remporte +10 points.`);
+        showScoreboard(false, `${eliminatedPlayer.name} (Mr. White) vole la victoire !`, `Devinette réussie ("${currentPair.civil}") ! +10 points.`);
       } else {
         alert(`Mauvais mot ! Le mot civil était "${currentPair.civil}".`);
         checkGameState();
@@ -536,11 +736,11 @@
           if (p.type === "undercover") addPoints(p.name, p.alive ? 6 : 3);
           if (p.type === "white" && p.alive) addPoints(p.name, 6);
         });
-        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs ont remporté la partie (+6 pts aux survivants).`);
+        showScoreboard(false, "Victoire des Imposteurs !", `Les imposteurs ont gagné (+6 pts aux survivants).`);
         return;
       }
 
-      showVoteScreen();
+      startNewSpeechRound();
     }
 
     function showScoreboard(fromMenu = false, title = "Tableau des Scores", desc = "") {
@@ -553,7 +753,6 @@
       tbody.innerHTML = "";
 
       const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
-
       sorted.forEach(([name, score]) => {
         const row = document.createElement("tr");
         row.innerHTML = `<td>${name}</td><td>${score} pts</td>`;
@@ -574,6 +773,10 @@
         showScoreboard(true, "Scores réinitialisés", "Compteurs remis à zéro.");
       }
     }
+
+    // Initialisation
+    updateAutoPreview();
+    updateManualTotal();
   </script>
 </body>
 </html>
