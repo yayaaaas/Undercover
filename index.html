@@ -3,15 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Undercover - Dark Cyber Edition</title>
+  <title>Undercover - Full Experience</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-dark: #0f111a;
-      --card-bg: rgba(23, 27, 44, 0.75);
-      --card-border: rgba(255, 255, 255, 0.08);
+      --bg: #0b0f19;
+      --bg-panel: rgba(17, 24, 39, 0.7);
+      --bg-panel-solid: #111827;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-focus: rgba(99, 102, 241, 0.6);
       --primary: #6366f1;
       --primary-hover: #4f46e5;
       --primary-glow: rgba(99, 102, 241, 0.35);
@@ -19,9 +21,9 @@
       --accent-pink: #f43f5e;
       --accent-amber: #f59e0b;
       --accent-purple: #a855f7;
-      --text-main: #f8fafc;
-      --text-muted: #94a3b8;
-      --input-bg: rgba(15, 17, 26, 0.65);
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --input-bg: rgba(3, 7, 18, 0.6);
     }
 
     * {
@@ -33,66 +35,125 @@
     }
 
     body {
-      background-color: var(--bg-dark);
+      background-color: var(--bg);
       background-image: 
-        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.12) 0px, transparent 50%);
+        radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.1) 0%, transparent 40%);
       color: var(--text-main);
-      display: flex;
-      justify-content: center;
-      align-items: center;
       min-height: 100vh;
-      padding: 16px;
+      display: flex;
+      flex-direction: column;
     }
 
-    .card {
-      background: var(--card-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--card-border);
-      border-radius: 24px;
-      padding: 2rem;
-      text-align: center;
-      max-width: 480px;
+    /* Header large */
+    header {
       width: 100%;
-      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
-      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      background: rgba(11, 15, 25, 0.8);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
     }
 
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(8px) scale(0.98); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    h2 {
-      font-size: 1.6rem;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       font-weight: 800;
-      margin-bottom: 8px;
+      font-size: 1.3rem;
+      letter-spacing: -0.5px;
       background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
     }
 
-    p.subtitle {
-      color: var(--text-muted);
-      font-size: 0.9rem;
-      margin-bottom: 20px;
+    /* Conteneur Plein Écran */
+    main {
+      flex: 1;
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
+    .screen-container {
+      width: 100%;
+      animation: fadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Grilles et Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .grid-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .panel {
+      background: var(--bg-panel);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 1.75rem;
+    }
+
+    /* Typographie */
+    h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -1px;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+    }
+
+    p.subtitle {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* Onglets de configuration */
     .tab-container {
       display: flex;
       background: var(--input-bg);
-      padding: 5px;
+      padding: 6px;
       border-radius: 14px;
-      gap: 4px;
-      margin-bottom: 20px;
-      border: 1px solid var(--card-border);
+      gap: 6px;
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 9px 8px;
-      font-size: 0.82rem;
+      padding: 12px;
+      font-size: 0.95rem;
       font-weight: 700;
       border-radius: 10px;
       border: none;
@@ -105,230 +166,217 @@
     .tab-btn.active {
       background: var(--primary);
       color: #fff;
-      box-shadow: 0 4px 12px var(--primary-glow);
+      box-shadow: 0 4px 14px var(--primary-glow);
     }
 
-    .input-group {
+    /* Formulaires */
+    .input-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
       background: var(--input-bg);
-      padding: 10px 14px;
-      border-radius: 12px;
-      margin-bottom: 10px;
-      border: 1px solid var(--card-border);
+      padding: 1rem 1.25rem;
+      border-radius: 14px;
+      margin-bottom: 0.75rem;
+      border: 1px solid var(--border);
     }
 
-    .input-group label {
-      font-size: 0.9rem;
+    .input-row label {
       font-weight: 600;
-      color: var(--text-muted);
+      color: var(--text-main);
     }
 
     input[type="number"], input[type="text"], select {
-      background: transparent;
-      border: 1px solid var(--card-border);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
       color: var(--text-main);
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 0.95rem;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 1rem;
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.2s;
     }
 
     input[type="number"] {
-      width: 65px;
+      width: 80px;
       text-align: center;
       font-weight: 700;
-      background: rgba(255, 255, 255, 0.03);
     }
 
-    input[type="text"]:focus, select:focus, input[type="number"]:focus {
-      border-color: var(--primary);
+    input[type="text"] {
+      width: 100%;
     }
 
-    .name-inputs-list {
+    input:focus, select:focus {
+      border-color: var(--border-focus);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    /* Boutons */
+    .btn-group {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 240px;
-      overflow-y: auto;
-      margin: 15px 0;
-      padding-right: 4px;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
     }
 
-    .name-inputs-list::-webkit-scrollbar {
-      width: 4px;
-    }
-    .name-inputs-list::-webkit-scrollbar-thumb {
-      background: var(--card-border);
-      border-radius: 4px;
-    }
-
-    button.btn-main {
+    button.btn-primary {
       background: linear-gradient(135deg, var(--primary) 0%, #4f46e5 100%);
       color: #fff;
       border: none;
-      padding: 14px 20px;
-      font-size: 0.95rem;
+      padding: 1rem 2rem;
+      font-size: 1rem;
       font-weight: 700;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
-      width: 100%;
-      margin-top: 12px;
-      box-shadow: 0 8px 20px var(--primary-glow);
+      box-shadow: 0 8px 24px var(--primary-glow);
       transition: transform 0.15s, box-shadow 0.15s;
+      flex: 1;
+      min-width: 200px;
     }
 
-    button.btn-main:active {
-      transform: scale(0.98);
+    button.btn-primary:hover {
+      box-shadow: 0 12px 28px var(--primary-glow);
+      transform: translateY(-2px);
+    }
+
+    button.btn-primary:active {
+      transform: translateY(0);
     }
 
     button.btn-secondary {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid var(--card-border);
-      padding: 12px 20px;
-      font-size: 0.9rem;
+      background: var(--input-bg);
+      color: var(--text-main);
+      border: 1px solid var(--border);
+      padding: 1rem 1.75rem;
+      font-size: 1rem;
       font-weight: 600;
-      border-radius: 12px;
+      border-radius: 14px;
       cursor: pointer;
-      width: 100%;
-      margin-top: 8px;
-      transition: background 0.2s, color 0.2s;
+      transition: background 0.2s, border-color 0.2s;
     }
 
     button.btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
     }
 
-    .badge {
-      background: rgba(245, 158, 11, 0.12);
-      border: 1px solid rgba(245, 158, 11, 0.25);
-      color: var(--accent-amber);
-      padding: 10px;
-      border-radius: 10px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin: 12px 0;
-    }
-
-    .secret-box {
-      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%);
+    /* Révélation Immersive */
+    .reveal-card {
+      background: radial-gradient(circle at center, rgba(16, 185, 129, 0.12) 0%, rgba(17, 24, 39, 0.8) 100%);
       border: 1px solid rgba(16, 185, 129, 0.3);
-      padding: 24px;
-      border-radius: 16px;
-      margin: 20px 0;
+      padding: 4rem 2rem;
+      border-radius: 28px;
+      text-align: center;
+      margin: 1.5rem 0;
     }
 
-    .secret-word {
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      color: var(--accent-green);
-      text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-    }
-
-    .white-box {
-      background: radial-gradient(circle, rgba(244, 63, 94, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%);
+    .reveal-card.white-role {
+      background: radial-gradient(circle at center, rgba(244, 63, 94, 0.12) 0%, rgba(17, 24, 39, 0.8) 100%);
       border-color: rgba(244, 63, 94, 0.3);
     }
 
-    .white-box .secret-word {
+    .secret-word-display {
+      font-size: 3.5rem;
+      font-weight: 800;
+      color: var(--accent-green);
+      letter-spacing: -1px;
+      text-shadow: 0 0 35px rgba(16, 185, 129, 0.4);
+      margin: 1rem 0;
+    }
+
+    .white-role .secret-word-display {
       color: var(--accent-pink);
-      text-shadow: 0 0 20px rgba(244, 63, 94, 0.4);
+      text-shadow: 0 0 35px rgba(244, 63, 94, 0.4);
     }
 
-    .power-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(168, 85, 247, 0.15);
-      border: 1px solid rgba(168, 85, 247, 0.3);
-      color: #d8b4fe;
-      padding: 6px 12px;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      margin-top: 10px;
+    /* Ordre de parole large */
+    .order-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+      margin: 1.5rem 0;
     }
 
-    .order-box {
+    .order-card {
       background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 14px;
-      padding: 10px 14px;
-      margin: 15px 0;
-      text-align: left;
-    }
-
-    .order-step {
+      border: 1px solid var(--border);
+      padding: 1.25rem;
+      border-radius: 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      gap: 1rem;
     }
-    .order-step:last-child { border-bottom: none; }
 
-    .order-number {
-      background: rgba(99, 102, 241, 0.15);
-      color: var(--primary);
-      border: 1px solid var(--primary-glow);
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
+    .order-badge {
+      background: var(--primary);
+      color: #fff;
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 800;
+    }
+
+    .power-tag {
+      background: rgba(168, 85, 247, 0.15);
+      border: 1px solid rgba(168, 85, 247, 0.3);
+      color: #d8b4fe;
+      padding: 4px 10px;
+      border-radius: 8px;
       font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-block;
+      margin-top: 6px;
     }
 
-    .vote-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+    /* Vote Cards */
+    .vote-card {
       background: var(--input-bg);
-      border: 1px solid var(--card-border);
-      padding: 8px 12px;
-      border-radius: 10px;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
     }
 
-    .vote-item select {
-      background: #1e2438;
-      width: 55%;
-      border-color: rgba(255, 255, 255, 0.1);
-      color: #fff;
+    .vote-card span {
+      font-weight: 700;
+      font-size: 1.1rem;
     }
 
-    .score-table {
+    /* Tableau des scores large */
+    .scoreboard-table {
       width: 100%;
       border-collapse: collapse;
-      margin: 15px 0;
+      margin: 1.5rem 0;
       background: var(--input-bg);
-      border-radius: 12px;
+      border-radius: 16px;
       overflow: hidden;
-      border: 1px solid var(--card-border);
+      border: 1px solid var(--border);
     }
 
-    .score-table th, .score-table td {
-      padding: 12px;
+    .scoreboard-table th, .scoreboard-table td {
+      padding: 1.25rem;
       text-align: left;
-      font-size: 0.9rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      border-bottom: 1px solid var(--border);
     }
-    .score-table th {
-      color: var(--text-muted);
-      font-size: 0.75rem;
+
+    .scoreboard-table th {
       text-transform: uppercase;
+      font-size: 0.8rem;
+      color: var(--text-muted);
       letter-spacing: 0.5px;
       background: rgba(255, 255, 255, 0.02);
     }
-    .score-table td:last-child {
+
+    .scoreboard-table td:last-child {
       text-align: right;
       font-weight: 800;
+      font-size: 1.2rem;
       color: var(--accent-amber);
     }
 
@@ -337,158 +385,217 @@
 </head>
 <body>
 
-  <!-- 1. CONFIGURATION -->
-  <div class="card" id="setup-screen">
-    <h2>Undercover</h2>
-    <p class="subtitle">Paramétrez votre manche</p>
-
-    <div class="tab-container">
-      <button class="tab-btn active" id="tab-mystery" onclick="setMode('mystery')">❓ Mystère</button>
-      <button class="tab-btn" id="tab-auto" onclick="setMode('auto')">🎲 Équilibré</button>
-      <button class="tab-btn" id="tab-manual" onclick="setMode('manual')">✏️ Manuel</button>
+  <!-- Navigation / Barre Supérieure -->
+  <header>
+    <div class="brand">
+      <span>🕵️ Undercover</span>
     </div>
+    <div>
+      <button class="btn-secondary" onclick="showScoreboard(true)" style="padding: 8px 16px; font-size: 0.85rem;">🏆 Scores</button>
+    </div>
+  </header>
 
-    <!-- Mode Mystère -->
-    <div id="mode-mystery-view">
-      <div class="input-group">
-        <label>Total Joueurs</label>
-        <input type="number" id="total-mystery-players" value="5" min="3" max="20">
+  <main>
+    <!-- 1. CONFIGURATION PLEIN ÉCRAN -->
+    <div class="screen-container" id="setup-screen">
+      <h1>Nouvelle Partie</h1>
+      <p class="subtitle">Ajustez les effectifs et activez les mécaniques de jeu selon vos envies.</p>
+
+      <div class="tab-container">
+        <button class="tab-btn active" id="tab-mystery" onclick="setMode('mystery')">❓ Mystère Total</button>
+        <button class="tab-btn" id="tab-auto" onclick="setMode('auto')">🎲 Répartition Équilibrée</button>
+        <button class="tab-btn" id="tab-manual" onclick="setMode('manual')">✏️ Configuration Manuelle</button>
       </div>
-      <div class="badge">❓ Rôles secrets imprévisibles (Undercovers / Mr. White variables)</div>
-    </div>
 
-    <!-- Mode Auto -->
-    <div id="mode-auto-view" class="hidden">
-      <div class="input-group">
-        <label>Total Joueurs</label>
-        <input type="number" id="total-auto-players" value="5" min="3" max="20" oninput="updateAutoPreview()">
+      <div class="grid-2">
+        <!-- Panneau de gauche : Effectifs -->
+        <div class="panel">
+          <h2>Rôles & Effectifs</h2>
+
+          <div id="mode-mystery-view">
+            <div class="input-row">
+              <label>Nombre total de joueurs</label>
+              <input type="number" id="total-mystery-players" value="5" min="3" max="20">
+            </div>
+            <div class="power-tag" style="width: 100%; text-align: center; padding: 10px; margin-top: 10px;">
+              ❓ Rôles secrets imprévisibles (0, 1 ou plusieurs Undercovers/Mr. White)
+            </div>
+          </div>
+
+          <div id="mode-auto-view" class="hidden">
+            <div class="input-row">
+              <label>Nombre total de joueurs</label>
+              <input type="number" id="total-auto-players" value="5" min="3" max="20" oninput="updateAutoPreview()">
+            </div>
+            <div class="power-tag" id="auto-preview-badge" style="width: 100%; text-align: center; padding: 10px; margin-top: 10px;">
+              Civils : 3 | Undercover : 1 | Mr. White : 1
+            </div>
+          </div>
+
+          <div id="mode-manual-view" class="hidden">
+            <div class="input-row">
+              <label>Civils</label>
+              <input type="number" id="nb-civils" value="3" min="1" oninput="updateManualTotal()">
+            </div>
+            <div class="input-row">
+              <label>Undercovers</label>
+              <input type="number" id="nb-undercovers" value="1" min="0" oninput="updateManualTotal()">
+            </div>
+            <div class="input-row">
+              <label>Mr. White</label>
+              <input type="number" id="nb-whites" value="1" min="0" oninput="updateManualTotal()">
+            </div>
+            <div class="power-tag" id="manual-total-badge" style="width: 100%; text-align: center; padding: 10px; margin-top: 10px;">
+              Total : 5 joueurs
+            </div>
+          </div>
+        </div>
+
+        <!-- Panneau de droite : Pouvoirs & Options -->
+        <div class="panel">
+          <h2>Pouvoirs Spéciaux</h2>
+          <div style="margin-bottom: 1.5rem;">
+            <label style="font-size: 0.9rem; color: var(--text-muted); display: block; margin-bottom: 8px;">Mode d'attribution</label>
+            <select id="secondary-roles-mode" onchange="toggleSecondarySettings()" style="width: 100%;">
+              <option value="none">Désactivés</option>
+              <option value="mystery" selected>❓ Mystère (0, 1 ou plusieurs pouvoirs distribués)</option>
+              <option value="manual">✏️ Choix manuel des rôles en jeu</option>
+            </select>
+          </div>
+
+          <div id="manual-secondary-box" class="hidden" style="display: flex; flex-direction: column; gap: 10px;">
+            <label class="input-row" style="cursor: pointer;">
+              <span>👑 <strong>Le Maire</strong> (Vote double)</span>
+              <input type="checkbox" id="role-mayor">
+            </label>
+            <label class="input-row" style="cursor: pointer;">
+              <span>🛡️ <strong>Le Bouclier</strong> (Survit à 1 élimination)</span>
+              <input type="checkbox" id="role-shield">
+            </label>
+            <label class="input-row" style="cursor: pointer;">
+              <span>🤐 <strong>Le Muet</strong> (Mime uniquement)</span>
+              <input type="checkbox" id="role-mute">
+            </label>
+          </div>
+        </div>
       </div>
-      <div class="badge" id="auto-preview-badge">Civils : 3 | Undercover : 1 | Mr. White : 1</div>
-    </div>
 
-    <!-- Mode Manuel -->
-    <div id="mode-manual-view" class="hidden">
-      <div class="input-group">
-        <label>Civils</label>
-        <input type="number" id="nb-civils" value="3" min="1" oninput="updateManualTotal()">
+      <div class="btn-group">
+        <button class="btn-primary" onclick="goToNamesScreen()">Nommer les participants →</button>
       </div>
-      <div class="input-group">
-        <label>Undercovers</label>
-        <input type="number" id="nb-undercovers" value="1" min="0" oninput="updateManualTotal()">
+    </div>
+
+    <!-- 2. SAISIE DES PRÉNOMS -->
+    <div class="screen-container hidden" id="names-screen">
+      <h1>Participants</h1>
+      <p class="subtitle">Indiquez les noms ou pseudos des joueurs pour cette manche.</p>
+      <div class="panel">
+        <div class="grid-cards" id="names-container"></div>
       </div>
-      <div class="input-group">
-        <label>Mr. White</label>
-        <input type="number" id="nb-whites" value="1" min="0" oninput="updateManualTotal()">
+      <div class="btn-group">
+        <button class="btn-primary" onclick="startGame()">Lancer la distribution des rôles →</button>
+        <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">← Configuration</button>
       </div>
-      <div class="badge" id="manual-total-badge">Total : 5 joueurs</div>
     </div>
 
-    <!-- Rôles secondaires -->
-    <div style="margin-top: 12px; text-align: left;">
-      <label style="font-size: 0.8rem; color: var(--text-muted); font-weight: 700; text-transform: uppercase;">Pouvoirs Spéciaux</label>
-      <select id="secondary-roles-mode" onchange="toggleSecondarySettings()" style="width: 100%; margin-top: 6px; background: var(--input-bg);">
-        <option value="none">Désactivés</option>
-        <option value="mystery" selected>❓ Mystère (0, 1 ou plusieurs pouvoirs)</option>
-        <option value="manual">✏️ Choix manuel précis</option>
-      </select>
+    <!-- 3. PASSAGE DU TÉLÉPHONE -->
+    <div class="screen-container hidden" id="pass-screen">
+      <div class="panel" style="text-align: center; padding: 4rem 2rem;">
+        <p class="subtitle" style="text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Au tour de</p>
+        <h1 style="color: var(--primary); font-size: 4rem; margin-bottom: 1rem;" id="player-target-name">---</h1>
+        <p class="subtitle">Prenez l'appareil et assurez-vous que personne ne regarde votre écran.</p>
+        <button class="btn-primary" onclick="showRole()" style="max-width: 320px; margin: 2rem auto 0 auto;">Voir mon rôle secret</button>
+      </div>
     </div>
 
-    <div id="manual-secondary-box" class="hidden" style="margin-top: 10px; background: var(--input-bg); padding: 12px; border-radius: 12px; border: 1px solid var(--card-border); text-align: left;">
-      <label style="display: flex; gap: 8px; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-main);">
-        <input type="checkbox" id="role-mayor"> 👑 Le Maire (Vote double)
-      </label>
-      <label style="display: flex; gap: 8px; margin-bottom: 8px; font-size: 0.85rem; color: var(--text-main);">
-        <input type="checkbox" id="role-shield"> 🛡️ Le Bouclier (Survit à 1 vote)
-      </label>
-      <label style="display: flex; gap: 8px; font-size: 0.85rem; color: var(--text-main);">
-        <input type="checkbox" id="role-mute"> 🤐 Le Muet (Mime uniquement)
-      </label>
+    <!-- 4. RÉVÉLATION SECRÈTE -->
+    <div class="screen-container hidden" id="reveal-screen">
+      <div class="panel" style="text-align: center;">
+        <h2 id="reveal-header">Votre mot secret</h2>
+        <div class="reveal-card" id="reveal-card-box">
+          <div class="secret-word-display" id="word-display">---</div>
+          <div id="power-display"></div>
+        </div>
+        <p class="subtitle" id="role-hint">Mémorisez-le bien et restez discret pendant les débats.</p>
+        <button class="btn-primary" onclick="nextPlayer()" style="max-width: 320px; margin: 0 auto;">Cacher et passer au suivant →</button>
+      </div>
     </div>
 
-    <button class="btn-main" onclick="goToNamesScreen()">Nommer les joueurs →</button>
-    <button class="btn-secondary" onclick="showScoreboard(true)">🏆 Tableau des Scores</button>
-  </div>
+    <!-- 5. ORDRE DE PAROLE -->
+    <div class="screen-container hidden" id="debate-screen">
+      <h1>Phase de Débat</h1>
+      <p class="subtitle">Chaque joueur donne un mot-indice à tour de rôle en suivant scrupuleusement cet ordre :</p>
+      
+      <div class="order-grid" id="speech-order-list"></div>
 
-  <!-- 2. SAISIE DES PRÉNOMS -->
-  <div class="card hidden" id="names-screen">
-    <h2>Joueurs</h2>
-    <p class="subtitle">Entrez les prénoms des participants</p>
-    <div class="name-inputs-list" id="names-container"></div>
-    <button class="btn-main" onclick="startGame()">Distribuer les rôles</button>
-    <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">← Retour</button>
-  </div>
-
-  <!-- 3. PASSAGE DU TÉLÉPHONE -->
-  <div class="card hidden" id="pass-screen">
-    <h2>À ton tour</h2>
-    <p class="subtitle">Passez le téléphone à</p>
-    <div style="font-size: 1.8rem; font-weight: 800; color: var(--primary); margin-bottom: 10px;" id="player-target-name">---</div>
-    <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 15px;">Regardez l'écran à l'abri des regards.</p>
-    <button class="btn-main" onclick="showRole()">Découvrir mon rôle</button>
-  </div>
-
-  <!-- 4. RÉVÉLATION DU MOT -->
-  <div class="card hidden" id="reveal-screen">
-    <h2 id="reveal-header">Ton mot secret</h2>
-    <div class="secret-box" id="secret-box-wrapper">
-      <div class="secret-word" id="word-display">---</div>
-      <div id="power-display"></div>
+      <div class="btn-group">
+        <button class="btn-primary" onclick="openVotePhase()">Passer aux Votes et Accusations →</button>
+      </div>
     </div>
-    <p class="subtitle" id="role-hint">Mémorisez-le bien et restez discret.</p>
-    <button class="btn-main" onclick="nextPlayer()">Cacher et passer →</button>
-  </div>
 
-  <!-- 5. ORDRE DE PAROLE -->
-  <div class="card hidden" id="debate-screen">
-    <h2>Tour de Table</h2>
-    <p class="subtitle">Donnez chacun un mot-indice dans l'ordre :</p>
-    <div class="order-box" id="speech-order-list"></div>
-    <button class="btn-main" onclick="openVotePhase()">Passer aux Votes →</button>
-  </div>
+    <!-- 6. VOTE INDIVIDUEL -->
+    <div class="screen-container hidden" id="vote-screen">
+      <h1>Scrutin & Accusations</h1>
+      <p class="subtitle">Chaque joueur vivant vote secrètement contre la personne qu'il soupçonne :</p>
+      
+      <div class="grid-cards" id="vote-inputs-container"></div>
 
-  <!-- 6. VOTE INDIVIDUEL -->
-  <div class="card hidden" id="vote-screen">
-    <h2>Accusation</h2>
-    <p class="subtitle">Sélectionnez qui chaque joueur souhaite éliminer :</p>
-    <div class="name-inputs-list" id="vote-inputs-container"></div>
-    <button class="btn-main" onclick="processVotes()">Dépouiller le scrutin</button>
-  </div>
+      <div class="btn-group">
+        <button class="btn-primary" onclick="processVotes()">Dépouiller les votes →</button>
+      </div>
+    </div>
 
-  <!-- 7. ÉGALITÉ -->
-  <div class="card hidden" id="tie-screen">
-    <h2>⚖️ Tour Neutre</h2>
-    <p class="subtitle" id="tie-desc">Égalité parfaite ou majorité de votes blancs. Personne n'est éliminé ce tour-ci.</p>
-    <button class="btn-main" onclick="startNewSpeechRound()">Nouveau tour de parole</button>
-  </div>
+    <!-- 7. ÉGALITÉ / TOUR NEUTRE -->
+    <div class="screen-container hidden" id="tie-screen">
+      <div class="panel" style="text-align: center; padding: 3rem 2rem;">
+        <h1 style="color: var(--accent-amber);">⚖️ Aucun Suspect Éliminé</h1>
+        <p class="subtitle" id="tie-desc" style="font-size: 1.2rem; margin: 1.5rem 0;">Égalité parfaite ou majorité de votes blancs.</p>
+        <button class="btn-primary" onclick="startNewSpeechRound()" style="max-width: 300px; margin: 0 auto;">Lancer un nouveau tour de parole</button>
+      </div>
+    </div>
 
-  <!-- 8. ÉLIMINATION -->
-  <div class="card hidden" id="eliminated-screen">
-    <h2 id="elim-title">Élimination</h2>
-    <p class="subtitle" id="elim-desc" style="font-size: 1rem; color: #fff; margin-top: 10px;"></p>
-    <button class="btn-main" onclick="continueAfterElimination()">Continuer</button>
-  </div>
+    <!-- 8. ÉLIMINATION -->
+    <div class="screen-container hidden" id="eliminated-screen">
+      <div class="panel" style="text-align: center; padding: 3rem 2rem;">
+        <h1 id="elim-title">Élimination</h1>
+        <p class="subtitle" id="elim-desc" style="font-size: 1.3rem; margin: 1.5rem 0; color: #fff;"></p>
+        <button class="btn-primary" onclick="continueAfterElimination()" style="max-width: 300px; margin: 0 auto;">Poursuivre la partie →</button>
+      </div>
+    </div>
 
-  <!-- 9. MR. WHITE GUESS -->
-  <div class="card hidden" id="white-guess-screen">
-    <h2 style="color: var(--accent-pink);">Dernière chance !</h2>
-    <p class="subtitle"><strong id="white-player-name"></strong> peut voler la victoire en devinant le mot des civils :</p>
-    <input type="text" id="white-guess-input" placeholder="Tapez le mot ici" style="width: 100%; margin-bottom: 10px;">
-    <button class="btn-main" onclick="checkWhiteGuess()">Tenter le vol (+10 pts)</button>
-  </div>
+    <!-- 9. MR. WHITE GUESS -->
+    <div class="screen-container hidden" id="white-guess-screen">
+      <div class="panel" style="text-align: center; padding: 3rem 2rem;">
+        <h1 style="color: var(--accent-pink);">Dernière Chance !</h1>
+        <p class="subtitle"><strong id="white-player-name"></strong> a été découvert mais peut voler la victoire (+10 pts) en devinant le mot exact des Civils :</p>
+        <div style="max-width: 400px; margin: 2rem auto;">
+          <input type="text" id="white-guess-input" placeholder="Tapez le mot civil ici..." style="font-size: 1.2rem; padding: 14px; text-align: center;">
+          <button class="btn-primary" onclick="checkWhiteGuess()" style="width: 100%; margin-top: 1rem;">Valider la devinette</button>
+        </div>
+      </div>
+    </div>
 
-  <!-- 10. SCOREBOARD -->
-  <div class="card hidden" id="scoreboard-screen">
-    <h2 id="winner-title">Fin de Manche</h2>
-    <p class="subtitle" id="winner-desc"></p>
-    <table class="score-table">
-      <thead>
-        <tr><th>Joueur</th><th>Score</th></tr>
-      </thead>
-      <tbody id="score-table-body"></tbody>
-    </table>
-    <button class="btn-main" onclick="restartMatch()">Manche Suivante</button>
-    <button class="btn-secondary" onclick="resetAllScores()">Remettre à 0</button>
-  </div>
+    <!-- 10. SCOREBOARD -->
+    <div class="screen-container hidden" id="scoreboard-screen">
+      <h1 id="winner-title">Fin de Manche</h1>
+      <p class="subtitle" id="winner-desc"></p>
+      
+      <div class="panel">
+        <h2>Classement Général</h2>
+        <table class="scoreboard-table">
+          <thead>
+            <tr><th>Joueur</th><th>Score</th></tr>
+          </thead>
+          <tbody id="score-table-body"></tbody>
+        </table>
+      </div>
+
+      <div class="btn-group">
+        <button class="btn-primary" onclick="restartMatch()">Manche Suivante →</button>
+        <button class="btn-secondary" onclick="resetAllScores()">Remettre les scores à zéro</button>
+      </div>
+    </div>
+  </main>
 
   <script>
     const wordPairs = [
@@ -613,12 +720,16 @@
       container.innerHTML = "";
 
       for (let i = 1; i <= totalPlayersCount; i++) {
-        const input = document.createElement("input");
-        input.type = "text";
-        input.placeholder = `Nom du Joueur ${i}`;
-        input.id = `player-name-input-${i}`;
-        if (savedNames[i - 1]) input.value = savedNames[i - 1];
-        container.appendChild(input);
+        const div = document.createElement("div");
+        div.className = "input-row";
+        div.style.flexDirection = "column";
+        div.style.alignItems = "flex-start";
+        div.style.gap = "6px";
+        div.innerHTML = `
+          <label style="font-size:0.85rem; color:var(--text-muted);">Joueur ${i}</label>
+          <input type="text" id="player-name-input-${i}" placeholder="Prénom..." value="${savedNames[i - 1] || ''}">
+        `;
+        container.appendChild(div);
       }
 
       hideAllScreens();
@@ -691,27 +802,27 @@
       const headerDisplay = document.getElementById("reveal-header");
       const hintDisplay = document.getElementById("role-hint");
       const powerDisplay = document.getElementById("power-display");
-      const boxWrapper = document.getElementById("secret-box-wrapper");
+      const boxWrapper = document.getElementById("reveal-card-box");
 
-      boxWrapper.classList.toggle("white-box", current.type === "white");
+      boxWrapper.classList.toggle("white-role", current.type === "white");
 
       if (current.type === "white") {
         headerDisplay.innerText = `${current.name}, tu es :`;
         wordDisplay.innerText = "Mr. White";
         hintDisplay.innerText = "Tu n'as aucun mot ! Écoute bien et bluffe.";
       } else {
-        headerDisplay.innerText = `${current.name}, ton mot :`;
+        headerDisplay.innerText = `${current.name}, ton mot secret :`;
         wordDisplay.innerText = current.word;
         hintDisplay.innerText = "Mémorise-le bien et reste discret !";
       }
 
       powerDisplay.innerHTML = "";
       if (current.power === "mayor") {
-        powerDisplay.innerHTML = `<div class="power-badge">👑 Le Maire (Vote compte double)</div>`;
+        powerDisplay.innerHTML = `<div class="power-tag">👑 Rôle Spécial : Le Maire (Vote compte double)</div>`;
       } else if (current.power === "shield") {
-        powerDisplay.innerHTML = `<div class="power-badge">🛡️ Le Bouclier (Survit à 1 élimination)</div>`;
+        powerDisplay.innerHTML = `<div class="power-tag">🛡️ Rôle Spécial : Le Bouclier (Survit à 1 élimination)</div>`;
       } else if (current.power === "mute") {
-        powerDisplay.innerHTML = `<div class="power-badge">🤐 Le Muet (Ne parle pas, mime uniquement)</div>`;
+        powerDisplay.innerHTML = `<div class="power-tag">🤐 Rôle Spécial : Le Muet (Mime uniquement)</div>`;
       }
 
       document.getElementById("reveal-screen").classList.remove("hidden");
@@ -735,13 +846,13 @@
 
       speechOrder.forEach((player, idx) => {
         const div = document.createElement("div");
-        div.className = "order-step";
+        div.className = "order-card";
         div.innerHTML = `
-          <div class="order-number">${idx + 1}</div>
+          <div class="order-badge">${idx + 1}</div>
           <div>
-            <strong>${player.name}</strong> 
-            ${idx === 0 ? '<span style="color:var(--accent-green); font-size:0.8rem; margin-left:6px; font-weight:700;">(Ouvre le tour)</span>' : ''}
-            ${player.power === 'mute' ? '<span style="color:var(--accent-pink); font-size:0.8rem; margin-left:4px;">🤐 Muet</span>' : ''}
+            <div style="font-weight: 700; font-size: 1.1rem;">${player.name}</div>
+            ${idx === 0 ? '<span style="color:var(--accent-green); font-size:0.8rem; font-weight:700;">★ Ouvre le tour</span>' : ''}
+            ${player.power === 'mute' ? '<span style="color:var(--accent-pink); font-size:0.8rem; margin-left:6px;">🤐 Muet</span>' : ''}
           </div>
         `;
         container.appendChild(div);
@@ -757,21 +868,21 @@
       container.innerHTML = "";
 
       alive.forEach(voter => {
-        const row = document.createElement("div");
-        row.className = "vote-item";
+        const card = document.createElement("div");
+        card.className = "vote-card";
         
-        let options = `<option value="-1">⚪ Vote blanc</option>`;
+        let options = `<option value="-1">⚪ Vote blanc / Passer</option>`;
         alive.forEach(suspect => {
           if (suspect.id !== voter.id) {
             options += `<option value="${suspect.id}">${suspect.name}</option>`;
           }
         });
 
-        row.innerHTML = `
-          <span><strong>${voter.name}</strong> ${voter.power === 'mayor' ? '👑' : ''}</span>
+        card.innerHTML = `
+          <span>${voter.name} ${voter.power === 'mayor' ? '👑' : ''}</span>
           <select id="vote-from-${voter.id}">${options}</select>
         `;
-        container.appendChild(row);
+        container.appendChild(card);
       });
 
       document.getElementById("vote-screen").classList.remove("hidden");
@@ -810,9 +921,9 @@
         hideAllScreens();
         if (topSuspects.length > 1) {
           const names = topSuspects.map(id => players.find(p => p.id === id).name).join(" et ");
-          document.getElementById("tie-desc").innerText = `Égalité entre ${names} (${maxVotes} voix). Personne n'est éliminé !`;
+          document.getElementById("tie-desc").innerText = `Égalité parfaite entre ${names} (${maxVotes} voix chacun). Personne n'est éliminé !`;
         } else {
-          document.getElementById("tie-desc").innerText = `Majorité de votes blancs. Aucun suspect éliminé.`;
+          document.getElementById("tie-desc").innerText = `Majorité de votes blancs. Aucun suspect n'est éliminé ce tour-ci.`;
         }
         document.getElementById("tie-screen").classList.remove("hidden");
         return;
@@ -825,7 +936,7 @@
     function handleElimination(player) {
       if (player.hasShield) {
         player.hasShield = false;
-        alert(`🛡️ ${player.name} possédait le Bouclier ! L'élimination est annulée.`);
+        alert(`🛡️ ${player.name} possédait le Bouclier ! L'élimination a été bloquée. Il reste en jeu !`);
         startNewSpeechRound();
         return;
       }
@@ -834,7 +945,7 @@
       eliminatedPlayer = player;
 
       hideAllScreens();
-      document.getElementById("elim-title").innerText = `${player.name} éliminé(e)`;
+      document.getElementById("elim-title").innerText = `${player.name} a été éliminé(e) !`;
 
       let roleText = "";
       if (player.type === "civil") roleText = `C'était un Civil (Mot : "${player.word}").`;
@@ -867,7 +978,7 @@
 
       if (guess === actualWord) {
         addPoints(eliminatedPlayer.name, 10);
-        showScoreboard(false, `${eliminatedPlayer.name} vole la victoire !`, `Devinette réussie ("${currentPair.civil}"). Il gagne +10 pts !`);
+        showScoreboard(false, `${eliminatedPlayer.name} vole la victoire !`, `Devinette réussie ("${currentPair.civil}") ! +10 points.`);
       } else {
         alert(`Mauvais mot ! Le mot civil était "${currentPair.civil}".`);
         checkGameState();
@@ -883,7 +994,7 @@
         players.forEach(p => {
           if (p.type === "civil") addPoints(p.name, p.alive ? 2 : 1);
         });
-        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs sont démasqués (+2 pts aux survivants).`);
+        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs sont éliminés (+2 pts aux survivants).`);
         return;
       }
 
@@ -911,7 +1022,7 @@
       const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
       sorted.forEach(([name, score]) => {
         const row = document.createElement("tr");
-        row.innerHTML = `<td>${name}</td><td>${score} pts</td>`;
+        row.innerHTML = `<td><strong>${name}</strong></td><td>${score} pts</td>`;
         tbody.appendChild(row);
       });
 
@@ -924,9 +1035,9 @@
     }
 
     function resetAllScores() {
-      if (confirm("Remettre les compteurs à 0 ?")) {
+      if (confirm("Remettre les scores de tous les joueurs à zéro ?")) {
         localStorage.removeItem("undercover_scores");
-        showScoreboard(true, "Scores réinitialisés", "Compteurs remis à zéro.");
+        showScoreboard(true, "Scores réinitialisés", "Tous les compteurs sont à 0.");
       }
     }
 
