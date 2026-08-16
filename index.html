@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Undercover - Noms Personnalisés</title>
+  <title>Undercover - Jeu Complet</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -22,7 +22,7 @@
       padding: 1.5rem 2rem;
       border-radius: 12px;
       text-align: center;
-      max-width: 450px;
+      max-width: 460px;
       width: 100%;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
@@ -53,7 +53,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-height: 250px;
+      max-height: 220px;
       overflow-y: auto;
       margin: 15px 0;
       padding-right: 5px;
@@ -67,11 +67,21 @@
       font-weight: bold;
       border-radius: 6px;
       cursor: pointer;
-      margin-top: 15px;
+      margin-top: 10px;
       width: 100%;
       transition: background 0.2s;
     }
     button:hover { background: #b4befe; }
+    .btn-secondary {
+      background: #45475a;
+      color: #cdd6f4;
+    }
+    .btn-secondary:hover { background: #585b70; }
+    .btn-danger {
+      background: #f38ba8;
+      color: #11111b;
+    }
+    .btn-danger:hover { background: #eba0ac; }
     .hidden { display: none; }
     .secret-word {
       font-size: 1.6rem;
@@ -97,13 +107,31 @@
       color: #bac2de;
       margin-bottom: 15px;
     }
+    .pair-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #181825;
+      padding: 8px 12px;
+      border-radius: 6px;
+      margin-bottom: 6px;
+      font-size: 0.95rem;
+    }
+    .pair-delete-btn {
+      width: auto;
+      margin: 0;
+      padding: 4px 8px;
+      background: #f38ba8;
+      color: #11111b;
+      font-size: 0.8rem;
+    }
   </style>
 </head>
 <body>
 
   <!-- 1. Configuration des effectifs -->
   <div class="card" id="setup-screen">
-    <h2>Configuration</h2>
+    <h2>Undercover</h2>
     <div class="input-group">
       <label>Civils :</label>
       <input type="number" id="nb-civils" value="3" min="1">
@@ -117,56 +145,71 @@
       <input type="number" id="nb-whites" value="1" min="0">
     </div>
     <button onclick="goToNamesScreen()">Suivant : Nommer les joueurs</button>
+    <button class="btn-secondary" onclick="showWordManagerScreen()">⚙️ Gérer les mots secrets</button>
   </div>
 
-  <!-- 2. Saisie des prénoms -->
+  <!-- 2. Gestion des mots secrets (LocalStorage) -->
+  <div class="card hidden" id="word-manager-screen">
+    <h2>Paires de mots</h2>
+    <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+      <input type="text" id="new-civil-word" placeholder="Mot Civil">
+      <input type="text" id="new-under-word" placeholder="Mot Undercover">
+    </div>
+    <button onclick="addCustomWordPair()">+ Ajouter la paire</button>
+    <div class="name-inputs-list" id="custom-words-list"></div>
+    <button class="btn-secondary" onclick="restoreDefaultWords()">Restaurer les mots par défaut</button>
+    <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">Retour</button>
+  </div>
+
+  <!-- 3. Saisie des prénoms (LocalStorage) -->
   <div class="card hidden" id="names-screen">
     <h2>Noms des Joueurs</h2>
-    <p>Entrez le prénom de chaque participant :</p>
+    <p style="font-size: 0.9rem; color: #a6adc8;">Entrez le nom de chaque participant :</p>
     <div class="name-inputs-list" id="names-container"></div>
     <button onclick="startGame()">Lancer la distribution</button>
+    <button class="btn-secondary" onclick="hideAllScreens(); document.getElementById('setup-screen').classList.remove('hidden');">Retour</button>
   </div>
 
-  <!-- 3. Écran intermédiaire (Passer le téléphone) -->
+  <!-- 4. Écran de passage du téléphone -->
   <div class="card hidden" id="pass-screen">
-    <h2 id="player-title">À ton tour !</h2>
+    <h2>À ton tour !</h2>
     <p>Donnez le téléphone à <strong id="player-target-name" style="color: #89b4fa;">---</strong>.</p>
-    <p style="font-size: 0.9rem; color: #a6adc8;">Regardez l'écran à l'abri des regards.</p>
+    <p style="font-size: 0.85rem; color: #a6adc8;">Regardez l'écran à l'abri des regards indiscrets.</p>
     <button onclick="showRole()">Voir mon mot</button>
   </div>
 
-  <!-- 4. Révélation secrète -->
+  <!-- 5. Révélation secrète -->
   <div class="card hidden" id="reveal-screen">
     <h2 id="reveal-header">Votre mot secret :</h2>
     <div class="secret-word" id="word-display">---</div>
-    <p id="role-hint">Mémorisez-le bien !</p>
+    <p id="role-hint">Mémorisez-le bien et restez discret !</p>
     <button onclick="nextPlayer()">Cacher et passer</button>
   </div>
 
-  <!-- 5. Phase de Débat et Vote -->
+  <!-- 6. Phase de Débat et Vote -->
   <div class="card hidden" id="vote-screen">
     <h2>Phase de Vote</h2>
     <p class="alive-count" id="alive-status"></p>
-    <p>Après les indices de chacun, qui éliminez-vous ?</p>
+    <p>Après les indices oraux, désignez qui éliminer :</p>
     <div class="vote-list" id="vote-buttons"></div>
   </div>
 
-  <!-- 6. Révélation de l'élimination -->
+  <!-- 7. Révélation de l'élimination -->
   <div class="card hidden" id="eliminated-screen">
     <h2 id="elim-title">Joueur éliminé</h2>
     <p id="elim-desc"></p>
-    <button id="elim-next-btn" onclick="continueAfterElimination()">Continuer</button>
+    <button onclick="continueAfterElimination()">Continuer</button>
   </div>
 
-  <!-- 7. Dernière chance Mr. White -->
+  <!-- 8. Dernière chance Mr. White -->
   <div class="card hidden" id="white-guess-screen">
     <h2 class="white-role">Dernière chance Mr. White !</h2>
-    <p><strong id="white-player-name"></strong> peut voler la victoire en devinant le mot exact des Civils :</p>
-    <input type="text" id="white-guess-input" placeholder="Entrez le mot ici">
+    <p><strong id="white-player-name"></strong> a été découvert mais peut gagner s'il devine le mot exact des Civils :</p>
+    <input type="text" id="white-guess-input" placeholder="Tapez le mot secret des civils">
     <button onclick="checkWhiteGuess()">Valider la tentative</button>
   </div>
 
-  <!-- 8. Fin de partie -->
+  <!-- 9. Fin de partie -->
   <div class="card hidden" id="gameover-screen">
     <h2 id="winner-title">Fin de partie</h2>
     <p id="winner-desc"></p>
@@ -174,7 +217,7 @@
   </div>
 
   <script>
-    const wordPairs = [
+    const defaultWordPairs = [
       { civil: "Chien", undercover: "Loup" },
       { civil: "Café", undercover: "Thé" },
       { civil: "Guitare", undercover: "Violon" },
@@ -191,14 +234,87 @@
     let eliminatedPlayer = null;
     let totalPlayersCount = 0;
 
+    // Utilitaires de navigation
     function hideAllScreens() {
       const screens = [
-        "setup-screen", "names-screen", "pass-screen", "reveal-screen",
-        "vote-screen", "eliminated-screen", "white-guess-screen", "gameover-screen"
+        "setup-screen", "word-manager-screen", "names-screen", 
+        "pass-screen", "reveal-screen", "vote-screen", 
+        "eliminated-screen", "white-guess-screen", "gameover-screen"
       ];
       screens.forEach(id => document.getElementById(id).classList.add("hidden"));
     }
 
+    // Gestion du LocalStorage des Mots
+    function getWordPairs() {
+      const saved = localStorage.getItem("undercover_words");
+      return saved ? JSON.parse(saved) : defaultWordPairs;
+    }
+
+    function saveWordPairs(pairs) {
+      localStorage.setItem("undercover_words", JSON.stringify(pairs));
+    }
+
+    function showWordManagerScreen() {
+      hideAllScreens();
+      renderWordPairsList();
+      document.getElementById("word-manager-screen").classList.remove("hidden");
+    }
+
+    function renderWordPairsList() {
+      const listContainer = document.getElementById("custom-words-list");
+      const pairs = getWordPairs();
+      listContainer.innerHTML = "";
+
+      pairs.forEach((pair, index) => {
+        const item = document.createElement("div");
+        item.className = "pair-item";
+        item.innerHTML = `
+          <span><strong>${pair.civil}</strong> / ${pair.undercover}</span>
+          <button class="pair-delete-btn" onclick="deleteWordPair(${index})">✕</button>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
+
+    function addCustomWordPair() {
+      const civilInput = document.getElementById("new-civil-word");
+      const underInput = document.getElementById("new-under-word");
+      const civil = civilInput.value.trim();
+      const undercover = underInput.value.trim();
+
+      if (!civil || !undercover) {
+        alert("Veuillez remplir les deux mots.");
+        return;
+      }
+
+      const pairs = getWordPairs();
+      pairs.push({ civil, undercover });
+      saveWordPairs(pairs);
+
+      civilInput.value = "";
+      underInput.value = "";
+      renderWordPairsList();
+    }
+
+    function deleteWordPair(index) {
+      const pairs = getWordPairs();
+      if (pairs.length <= 1) {
+        alert("Il doit rester au moins une paire de mots pour jouer.");
+        return;
+      }
+      pairs.splice(index, 1);
+      saveWordPairs(pairs);
+      renderWordPairsList();
+    }
+
+    function restoreDefaultWords() {
+      if (confirm("Réinitialiser toutes les paires de mots avec la liste par défaut ?")) {
+        saveWordPairs(defaultWordPairs);
+        renderWordPairsList();
+      }
+    }
+
+    // Gestion des Noms et Transition
     function goToNamesScreen() {
       const civilsCount = parseInt(document.getElementById("nb-civils").value) || 0;
       const undercoversCount = parseInt(document.getElementById("nb-undercovers").value) || 0;
@@ -207,10 +323,11 @@
       totalPlayersCount = civilsCount + undercoversCount + whitesCount;
 
       if (totalPlayersCount < 3) {
-        alert("Il faut au minimum 3 joueurs au total !");
+        alert("Il faut au minimum 3 joueurs au total pour lancer une partie.");
         return;
       }
 
+      const savedNames = JSON.parse(localStorage.getItem("undercover_players")) || [];
       const container = document.getElementById("names-container");
       container.innerHTML = "";
 
@@ -219,6 +336,7 @@
         input.type = "text";
         input.placeholder = `Nom du Joueur ${i}`;
         input.id = `player-name-input-${i}`;
+        if (savedNames[i - 1]) input.value = savedNames[i - 1];
         container.appendChild(input);
       }
 
@@ -226,31 +344,30 @@
       document.getElementById("names-screen").classList.remove("hidden");
     }
 
+    // Lancement de la partie
     function startGame() {
       const civilsCount = parseInt(document.getElementById("nb-civils").value) || 0;
       const undercoversCount = parseInt(document.getElementById("nb-undercovers").value) || 0;
       const whitesCount = parseInt(document.getElementById("nb-whites").value) || 0;
 
-      // Récupération des prénoms saisis
       const enteredNames = [];
       for (let i = 1; i <= totalPlayersCount; i++) {
         const val = document.getElementById(`player-name-input-${i}`).value.trim();
         enteredNames.push(val !== "" ? val : `Joueur ${i}`);
       }
 
-      // Choix de la paire de mots
-      currentPair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+      localStorage.setItem("undercover_players", JSON.stringify(enteredNames));
 
-      // Création du deck de rôles
+      const pairs = getWordPairs();
+      currentPair = pairs[Math.floor(Math.random() * pairs.length)];
+
       let roleDeck = [];
       for (let i = 0; i < civilsCount; i++) roleDeck.push({ type: "civil", word: currentPair.civil });
       for (let i = 0; i < undercoversCount; i++) roleDeck.push({ type: "undercover", word: currentPair.undercover });
       for (let i = 0; i < whitesCount; i++) roleDeck.push({ type: "white", word: null });
 
-      // Mélange aléatoire des rôles
       roleDeck.sort(() => Math.random() - 0.5);
 
-      // Attribution secrète des rôles aux prénoms
       players = enteredNames.map((name, index) => ({
         name: name,
         type: roleDeck[index].type,
@@ -280,9 +397,9 @@
         headerDisplay.innerText = `${current.name}, tu es :`;
         wordDisplay.innerText = "Mr. White";
         wordDisplay.className = "secret-word white-role";
-        hintDisplay.innerText = "Tu n'as aucun mot ! Écoute les indices et bluffe pour survivre.";
+        hintDisplay.innerText = "Tu n'as aucun mot ! Écoute les indices et bluffe sans te faire repérer.";
       } else {
-        headerDisplay.innerText = `${current.name}, ton mot est :`;
+        headerDisplay.innerText = `${current.name}, ton mot secret :`;
         wordDisplay.innerText = current.word;
         wordDisplay.className = "secret-word";
         hintDisplay.innerText = "Mémorise-le bien et reste discret !";
@@ -300,6 +417,7 @@
       }
     }
 
+    // Phase de Vote
     function showVoteScreen() {
       hideAllScreens();
       const alivePlayers = players.filter(p => p.alive);
@@ -307,7 +425,7 @@
       const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
 
       document.getElementById("alive-status").innerText = 
-        `Joueurs en lice (${alivePlayers.length}) — Civils : ${civilsAlive} | Ennemis : ${impostorsAlive}`;
+        `Joueurs restants : ${alivePlayers.length} (Civils : ${civilsAlive} | Imposteurs : ${impostorsAlive})`;
 
       const buttonsContainer = document.getElementById("vote-buttons");
       buttonsContainer.innerHTML = "";
@@ -328,11 +446,11 @@
       eliminatedPlayer = player;
 
       hideAllScreens();
-      document.getElementById("elim-title").innerText = `${player.name} est éliminé(e) !`;
+      document.getElementById("elim-title").innerText = `${player.name} a été éliminé(e) !`;
 
       let roleText = "";
-      if (player.type === "civil") roleText = `C'était un Civil (Mot : ${player.word}).`;
-      if (player.type === "undercover") roleText = `C'était un Undercover (Mot : ${player.word}).`;
+      if (player.type === "civil") roleText = `C'était un Civil (Mot : "${player.word}").`;
+      if (player.type === "undercover") roleText = `C'était un Undercover (Mot : "${player.word}").`;
       if (player.type === "white") roleText = `C'était Mr. White !`;
 
       document.getElementById("elim-desc").innerText = roleText;
@@ -355,9 +473,9 @@
       const actualWord = currentPair.civil.toLowerCase();
 
       if (guess === actualWord) {
-        endGame(`${eliminatedPlayer.name} (Mr. White) gagne la partie !`, `Le mot des civils était bien "${currentPair.civil}".`);
+        endGame(`${eliminatedPlayer.name} (Mr. White) vole la victoire !`, `Il a trouvé le mot des civils ("${currentPair.civil}").`);
       } else {
-        alert(`Mauvais mot ! C'était "${currentPair.civil}". ${eliminatedPlayer.name} quitte la partie.`);
+        alert(`Mauvais mot ! Le mot civil était "${currentPair.civil}". ${eliminatedPlayer.name} est éliminé définitivement.`);
         checkGameState();
       }
     }
@@ -368,12 +486,12 @@
       const impostorsAlive = alivePlayers.filter(p => p.type !== 'civil').length;
 
       if (impostorsAlive === 0) {
-        endGame("Victoire des Civils !", `Tous les imposteurs sont démasqués. Mot secret : "${currentPair.civil}".`);
+        endGame("Victoire des Civils !", `Tous les imposteurs ont été éliminés. Le mot était "${currentPair.civil}".`);
         return;
       }
 
       if (impostorsAlive >= civilsAlive) {
-        endGame("Victoire des Imposteurs !", `Les imposteurs sont majoritaires. Civils : "${currentPair.civil}" | Undercovers : "${currentPair.undercover}".`);
+        endGame("Victoire des Imposteurs !", `Les imposteurs sont en supériorité numérique. Mot Civil : "${currentPair.civil}" | Mot Undercover : "${currentPair.undercover}".`);
         return;
       }
 
