@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jeu Undercover</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #1e1e2e;
+      color: #cdd6f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: #313244;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    button {
+      background: #89b4fa;
+      color: #11111b;
+      border: none;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 15px;
+    }
+    button:hover {
+      background: #b4befe;
+    }
+    .hidden { display: none; }
+    .secret-word {
+      font-size: 1.5rem;
+      color: #a6e3a1;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="setup-screen">
+    <h2>Configuration de la partie</h2>
+    <p>Nombre de joueurs : <strong>4</strong> (3 Civils, 1 Undercover)</p>
+    <button onclick="startGame()">Lancer la distribution</button>
+  </div>
+
+  <div class="card hidden" id="pass-screen">
+    <h2 id="player-title">Joueur 1</h2>
+    <p>Prenez le téléphone sans montrer l'écran aux autres.</p>
+    <button onclick="showRole()">Voir mon mot</button>
+  </div>
+
+  <div class="card hidden" id="reveal-screen">
+    <h2>Votre mot secret :</h2>
+    <div class="secret-word" id="word-display">---</div>
+    <p>Mémorisez-le bien !</p>
+    <button onclick="nextPlayer()">Cacher et passer</button>
+  </div>
+
+  <div class="card hidden" id="end-screen">
+    <h2>Tous les rôles sont distribués !</h2>
+    <p>Le débat commence : chaque joueur donne un indice à tour de rôle.</p>
+    <button onclick="resetGame()">Nouvelle partie</button>
+  </div>
+
+  <script>
+    // Paires de mots (Civil / Undercover)
+    const wordPairs = [
+      { civil: "Chien", undercover: "Loup" },
+      { civil: "Café", undercover: "Thé" },
+      { civil: "Guitare", undercover: "Violon" },
+      { civil: "Avion", undercover: "Hélicoptère" },
+      { civil: "Pizza", undercover: "Burger" }
+    ];
+
+    let players = [];
+    let currentPlayerIndex = 0;
+
+    function startGame() {
+      // 1. Choisir une paire de mots aléatoire
+      const pair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+
+      // 2. Définir les rôles (ex: 3 civils, 1 undercover)
+      const roles = [pair.civil, pair.civil, pair.civil, pair.undercover];
+
+      // 3. Mélanger les rôles aléatoirement (Fisher-Yates)
+      players = roles.sort(() => Math.random() - 0.5);
+      currentPlayerIndex = 0;
+
+      // 4. Passer au premier joueur
+      showPassScreen();
+    }
+
+    function showPassScreen() {
+      document.getElementById("setup-screen").classList.add("hidden");
+      document.getElementById("reveal-screen").classList.add("hidden");
+      document.getElementById("end-screen").classList.add("hidden");
+
+      document.getElementById("player-title").innerText = `Joueur ${currentPlayerIndex + 1}`;
+      document.getElementById("pass-screen").classList.remove("hidden");
+    }
+
+    function showRole() {
+      document.getElementById("pass-screen").classList.add("hidden");
+      document.getElementById("word-display").innerText = players[currentPlayerIndex];
+      document.getElementById("reveal-screen").classList.remove("hidden");
+    }
+
+    function nextPlayer() {
+      currentPlayerIndex++;
+      if (currentPlayerIndex < players.length) {
+        showPassScreen();
+      } else {
+        document.getElementById("reveal-screen").classList.add("hidden");
+        document.getElementById("end-screen").classList.remove("hidden");
+      }
+    }
+
+    function resetGame() {
+      document.getElementById("end-screen").classList.add("hidden");
+      document.getElementById("setup-screen").classList.remove("hidden");
+    }
+  </script>
+</body>
+</html>
