@@ -616,7 +616,6 @@
       <h1 id="winner-title">Fin de Manche</h1>
       <p class="subtitle" id="winner-desc"></p>
       
-      <!-- Récapitulatif complet de fin de manche -->
       <div class="panel" id="endgame-recap-panel">
         <h2>🔍 Révélation des Mots & Rôles</h2>
         <div class="recap-box" id="recap-box-content"></div>
@@ -640,18 +639,105 @@
   </main>
 
   <script>
-    const wordPairs = [
-      { civil: "TikTok", undercover: "Instagram" },
-      { civil: "Netflix", undercover: "Prime Video" },
-      { civil: "Spotify", undercover: "Apple Music" },
-      { civil: "Uber Eats", undercover: "Deliveroo" },
-      { civil: "Tacos", undercover: "Kebab" },
-      { civil: "Fortnite", undercover: "Valorant" },
-      { civil: "AirPods", undercover: "Casque Marshall" },
-      { civil: "Chien", undercover: "Chat" },
-      { civil: "Café", undercover: "Thé" },
-      { civil: "Soleil", undercover: "Lune" }
+    // Grand catalogue de mots
+    const allWordPairs = [
+      // Pop Culture, Réseaux & Streaming
+      { w1: "TikTok", w2: "Instagram" },
+      { w1: "Netflix", w2: "Prime Video" },
+      { w1: "Spotify", w2: "Apple Music" },
+      { w1: "Uber Eats", w2: "Deliveroo" },
+      { w1: "Tinder", w2: "Hinge" },
+      { w1: "BeReal", w2: "Story" },
+      { w1: "ChatGPT", w2: "Google" },
+      { w1: "AirPods", w2: "Casque Marshall" },
+      { w1: "Twitch", w2: "Kick" },
+      { w1: "Discord", w2: "Slack" },
+      
+      // Rap, Animes & Gaming
+      { w1: "One Piece", w2: "Naruto" },
+      { w1: "Demon Slayer", w2: "Jujutsu Kaisen" },
+      { w1: "L'Attaque des Titans", w2: "Death Note" },
+      { w1: "Fortnite", w2: "Valorant" },
+      { w1: "League of Legends", w2: "TFT" },
+      { w1: "Mario Kart", w2: "Smash Bros" },
+      { w1: "GTA", w2: "Cyberpunk" },
+      { w1: "Jul", w2: "SCH" },
+      { w1: "Laylow", w2: "Damso" },
+      { w1: "PNL", w2: "DTF" },
+      { w1: "Gazo", w2: "Freeze Corleone" },
+      { w1: "Squeezie", w2: "Mcfly & Carlito" },
+      { w1: "Inoxtag", w2: "Michou" },
+
+      // Mode, Lifestyle & Quotidien
+      { w1: "Friperie", w2: "Vinted" },
+      { w1: "Stan Smith", w2: "Samba" },
+      { w1: "Dunk Low", w2: "Air Force 1" },
+      { w1: "Crocs", w2: "Birkenstock" },
+      { w1: "Bubble Tea", w2: "Matcha Latte" },
+      { w1: "Tacos", w2: "Kebab" },
+      { w1: "Pizza", w2: "Burger" },
+      { w1: "Café", w2: "Thé" },
+      { w1: "Monster Energy", w2: "Red Bull" },
+      { w1: "Tequila", w2: "Jägermeister" },
+      { w1: "Salle de sport", w2: "Basic-Fit" },
+      { w1: "Before", w2: "After" },
+      { w1: "Airbnb", w2: "Auberge de jeunesse" },
+      { w1: "Colocation", w2: "Studio CROUS" },
+      { w1: "Red flag", w2: "Green flag" },
+
+      // Paires Classiques Undercover
+      { w1: "Chien", w2: "Chat" },
+      { w1: "Lion", w2: "Tigre" },
+      { w1: "Soleil", w2: "Lune" },
+      { w1: "Avion", w2: "Hélicoptère" },
+      { w1: "Guitare", w2: "Violon" },
+      { w1: "Plage", w2: "Piscine" },
+      { w1: "Cinéma", w2: "Théâtre" },
+      { w1: "Lunettes", w2: "Lentilles" },
+      { w1: "Vélo", w2: "Trottinette" },
+      { w1: "Voiture", w2: "Moto" },
+      { w1: "Pomme", w2: "Poire" },
+      { w1: "Fraise", w2: "Framboise" },
+      { w1: "Fourchette", w2: "Cuillère" },
+      { w1: "Bague", w2: "Bracelet" },
+      { w1: "Manteau", w2: "Veste" },
+      { w1: "Montre", w2: "Horloge" },
+      { w1: "Miroir", w2: "Vitre" },
+      { w1: "Lampe", w2: "Bougie" },
+      { w1: "Douche", w2: "Baignoire" },
+      { w1: "Savon", w2: "Gel douche" },
+      { w1: "Mer", w2: "Océan" },
+      { w1: "Forêt", w2: "Jungle" },
+      { w1: "Pluie", w2: "Neige" },
+      { w1: "Médecin", w2: "Infirmier" },
+      { w1: "Policier", w2: "Gendarme" },
+      { w1: "Professeur", w2: "Formateur" },
+      { w1: "Hôtel", w2: "Camping" },
+      { w1: "Gare", w2: "Aéroport" },
+      { w1: "Fauteuil", w2: "Canapé" },
+      { w1: "Oreiller", w2: "Coussin" },
+      { w1: "Porte", w2: "Fenêtre" }
     ];
+
+    // Pioche sans remise (Deck de cartes)
+    let availableWordsPool = [];
+
+    function pickRandomWordPair() {
+      // Si la pioche est vide ou non initialisée, on la recharge et on la mélange
+      if (!availableWordsPool || availableWordsPool.length === 0) {
+        availableWordsPool = [...allWordPairs].sort(() => Math.random() - 0.5);
+      }
+
+      // On extrait la dernière paire du deck (garantie zéro doublon tant que le deck n'est pas vide)
+      const selected = availableWordsPool.pop();
+
+      // Tirage à pile ou face pour savoir quel mot sera Civil et quel mot sera Undercover
+      const invert = Math.random() < 0.5;
+      return {
+        civil: invert ? selected.w2 : selected.w1,
+        undercover: invert ? selected.w1 : selected.w2
+      };
+    }
 
     let currentMode = "mystery";
     let counts = { civils: 3, undercovers: 1, whites: 1 };
@@ -793,7 +879,8 @@
       });
       saveScores(currentScores);
 
-      currentPair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+      // Tirage avec anti-doublon et inversion aléatoire
+      currentPair = pickRandomWordPair();
 
       let roleDeck = [];
       for (let i = 0; i < counts.civils; i++) roleDeck.push({ type: "civil", word: currentPair.civil });
@@ -883,7 +970,6 @@
       hideAllScreens();
       const alive = players.filter(p => p.alive);
       
-      // Mélange aléatoire
       let speechOrder = [...alive].sort(() => Math.random() - 0.5);
 
       // Empêcher Mr. White de commencer en premier
@@ -986,7 +1072,6 @@
       handleElimination(eliminated);
     }
 
-    // Élimination : Affichage clair du RÔLE (sans dévoiler le mot)
     function handleElimination(player) {
       if (player.hasShield) {
         player.hasShield = false;
@@ -1054,7 +1139,7 @@
         players.forEach(p => {
           if (p.type === "civil") addPoints(p.name, p.alive ? 2 : 1);
         });
-        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs sont éliminés (+2 pts aux survivants).`);
+        showScoreboard(false, "Victoire des Civils !", `Tous les imposteurs ont été démasqués (+2 pts aux survivants).`);
         return;
       }
 
@@ -1134,7 +1219,7 @@
     function resetAllScores() {
       if (confirm("Remettre les scores de tous les joueurs à zéro ?")) {
         localStorage.removeItem("undercover_scores");
-        showScoreboard(true, "Scores réinitialisés", "Compteurs remis à zéro.");
+        showScoreboard(true, "Scores réinitialisés", "Tous les compteurs sont à 0.");
       }
     }
 
