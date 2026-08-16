@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jeu Undercover</title>
+  <title>Jeu Undercover & Mr. White</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -17,12 +17,28 @@
     }
     .card {
       background: #313244;
-      padding: 2rem;
+      padding: 1.5rem 2rem;
       border-radius: 12px;
       text-align: center;
       max-width: 400px;
       width: 90%;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+    .input-group {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 10px 0;
+    }
+    input[type="number"] {
+      width: 60px;
+      padding: 6px;
+      border-radius: 6px;
+      border: 1px solid #45475a;
+      background: #181825;
+      color: #cdd6f4;
+      text-align: center;
+      font-size: 1rem;
     }
     button {
       background: #89b4fa;
@@ -35,70 +51,104 @@
       cursor: pointer;
       margin-top: 15px;
     }
-    button:hover {
-      background: #b4befe;
-    }
+    button:hover { background: #b4befe; }
     .hidden { display: none; }
     .secret-word {
-      font-size: 1.5rem;
+      font-size: 1.6rem;
       color: #a6e3a1;
       font-weight: bold;
       margin: 20px 0;
+    }
+    .white-role {
+      color: #f38ba8;
     }
   </style>
 </head>
 <body>
 
+  <!-- Écran de configuration -->
   <div class="card" id="setup-screen">
-    <h2>Configuration de la partie</h2>
-    <p>Nombre de joueurs : <strong>4</strong> (3 Civils, 1 Undercover)</p>
-    <button onclick="startGame()">Lancer la distribution</button>
+    <h2>Configuration</h2>
+    <div class="input-group">
+      <label>Civils :</label>
+      <input type="number" id="nb-civils" value="3" min="1">
+    </div>
+    <div class="input-group">
+      <label>Undercovers :</label>
+      <input type="number" id="nb-undercovers" value="1" min="0">
+    </div>
+    <div class="input-group">
+      <label>Mr. White :</label>
+      <input type="number" id="nb-whites" value="1" min="0">
+    </div>
+    <button onclick="startGame()">Lancer la partie</button>
   </div>
 
+  <!-- Écran de transition -->
   <div class="card hidden" id="pass-screen">
     <h2 id="player-title">Joueur 1</h2>
-    <p>Prenez le téléphone sans montrer l'écran aux autres.</p>
-    <button onclick="showRole()">Voir mon mot</button>
+    <p>Prenez l'appareil sans montrer l'écran.</p>
+    <button onclick="showRole()">Voir mon rôle / mot</button>
   </div>
 
+  <!-- Écran de révélation -->
   <div class="card hidden" id="reveal-screen">
-    <h2>Votre mot secret :</h2>
+    <h2 id="reveal-header">Votre mot :</h2>
     <div class="secret-word" id="word-display">---</div>
-    <p>Mémorisez-le bien !</p>
+    <p id="role-hint">Mémorisez-le bien !</p>
     <button onclick="nextPlayer()">Cacher et passer</button>
   </div>
 
+  <!-- Écran de fin de distribution -->
   <div class="card hidden" id="end-screen">
-    <h2>Tous les rôles sont distribués !</h2>
-    <p>Le débat commence : chaque joueur donne un indice à tour de rôle.</p>
+    <h2>Distribution terminée !</h2>
+    <p>Le débat commence. Donnez chacun un indice sans vous faire démasquer.</p>
     <button onclick="resetGame()">Nouvelle partie</button>
   </div>
 
   <script>
-    // Paires de mots (Civil / Undercover)
     const wordPairs = [
       { civil: "Chien", undercover: "Loup" },
       { civil: "Café", undercover: "Thé" },
       { civil: "Guitare", undercover: "Violon" },
       { civil: "Avion", undercover: "Hélicoptère" },
-      { civil: "Pizza", undercover: "Burger" }
+      { civil: "Pizza", undercover: "Burger" },
+      { civil: "Soleil", undercover: "Lune" }
     ];
 
     let players = [];
     let currentPlayerIndex = 0;
 
     function startGame() {
-      // 1. Choisir une paire de mots aléatoire
+      const civilsCount = parseInt(document.getElementById("nb-civils").value) || 0;
+      const undercoversCount = parseInt(document.getElementById("nb-undercovers").value) || 0;
+      const whitesCount = parseInt(document.getElementById("nb-whites").value) || 0;
+
+      if (civilsCount + undercoversCount + whitesCount < 3) {
+        alert("Il faut au minimum 3 joueurs au total !");
+        return;
+      }
+
       const pair = wordPairs[Math.floor(Math.random() * wordPairs.length)];
+      players = [];
 
-      // 2. Définir les rôles (ex: 3 civils, 1 undercover)
-      const roles = [pair.civil, pair.civil, pair.civil, pair.undercover];
+      for (let i = 0; i < civilsCount; i++) {
+        players.push({ type: "civil", word: pair.civil });
+      }
+      for (let i = 0; i < undercoversCount; i++) {
+        players.push({ type: "undercover", word: pair.undercover });
+      }
+      for (let i = 0; i < whitesCount; i++) {
+        players.push({ type: "white", word: null });
+      }
 
-      // 3. Mélanger les rôles aléatoirement (Fisher-Yates)
-      players = roles.sort(() => Math.random() - 0.5);
+      // Mélange aléatoire (Fisher-Yates)
+      for (let i = players.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [players[i], players[j]] = [players[j], players[i]];
+      }
+
       currentPlayerIndex = 0;
-
-      // 4. Passer au premier joueur
       showPassScreen();
     }
 
@@ -113,7 +163,23 @@
 
     function showRole() {
       document.getElementById("pass-screen").classList.add("hidden");
-      document.getElementById("word-display").innerText = players[currentPlayerIndex];
+      const current = players[currentPlayerIndex];
+      const wordDisplay = document.getElementById("word-display");
+      const headerDisplay = document.getElementById("reveal-header");
+      const hintDisplay = document.getElementById("role-hint");
+
+      if (current.type === "white") {
+        headerDisplay.innerText = "Vous êtes :";
+        wordDisplay.innerText = "Mr. White";
+        wordDisplay.className = "secret-word white-role";
+        hintDisplay.innerText = "Vous n'avez aucun mot ! Bluffez et devinez le mot des civils.";
+      } else {
+        headerDisplay.innerText = "Votre mot secret :";
+        wordDisplay.innerText = current.word;
+        wordDisplay.className = "secret-word";
+        hintDisplay.innerText = "Mémorisez-le bien !";
+      }
+
       document.getElementById("reveal-screen").classList.remove("hidden");
     }
 
